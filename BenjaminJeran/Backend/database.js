@@ -21,7 +21,6 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
     }
 });
 
-
 function initializeDatabase() {
     console.log('Initializing database schema...');
     const createTableQuery = `

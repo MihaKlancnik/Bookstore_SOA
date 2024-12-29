@@ -1,2 +1,29 @@
-node_modules
-package-lock.json
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Environment variables
+.env
+
+# Build output
+dist
+build
+
+# Temporary files
+temp
+tmp
+.cache
+
+# Operating system files
+.DS_Store
+Thumbs.db
+
+# Other
+*.tgz
+
+# Database
+inventory.db

@@ -5,20 +5,40 @@ const router = express.Router();
 
 /**
  * @swagger
- * /:
+ * /users:
  *   get:
  *     summary: Get all users
  *     responses:
  *       200:
  *         description: A list of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: integer
+ *                   name:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *               example:
+ *                 - id: 1
+ *                   name: "John Doe"
+ *                   email: "johndoe@example.com"
+ *                 - id: 2
+ *                   name: "Jane Smith"
+ *                   email: "janesmith@example.com"
  *       500:
  *         description: Internal server error
  */
-router.get('/', userController.getAllUsers); 
+router.get('/', userController.getAllUsers);
 
 /**
  * @swagger
- * /{id}:
+ * /users/{id}:
  *   get:
  *     summary: Get a user by ID
  *     parameters:
@@ -31,16 +51,40 @@ router.get('/', userController.getAllUsers);
  *     responses:
  *       200:
  *         description: A user object
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *                 name:
+ *                   type: string
+ *                 email:
+ *                   type: string
+ *               example:
+ *                 id: 1
+ *                 name: "John Doe"
+ *                 email: "johndoe@example.com"
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: "User not found"
  *       500:
  *         description: Internal server error
  */
-router.get('/:id', userController.getUserById); 
+router.get('/:id', userController.getUserById);
 
 /**
  * @swagger
- * /:
+ * /users:
  *   post:
  *     summary: Create a new user
  *     requestBody:
@@ -65,16 +109,34 @@ router.get('/:id', userController.getUserById);
  *     responses:
  *       201:
  *         description: User created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 id:
+ *                   type: integer
+ *               example:
+ *                 id: 1
  *       400:
  *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: "Invalid input: Email is required."
  *       500:
  *         description: Internal server error
  */
-router.post('/', userController.createUser); 
+router.post('/', userController.createUser);
 
 /**
  * @swagger
- * /bulk:
+ * /users/bulk:
  *   post:
  *     summary: Create multiple users
  *     requestBody:
@@ -101,8 +163,26 @@ router.post('/', userController.createUser);
  *     responses:
  *       201:
  *         description: Users created successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *               example:
+ *                 message: "2 users created successfully"
  *       400:
  *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: "Invalid input: One or more users are missing required fields."
  *       500:
  *         description: Internal server error
  */
@@ -110,7 +190,7 @@ router.post('/bulk', userController.createMultipleUsers);
 
 /**
  * @swagger
- * /{id}:
+ * /users/{id}:
  *   put:
  *     summary: Update a user by ID
  *     parameters:
@@ -142,18 +222,45 @@ router.post('/bulk', userController.createMultipleUsers);
  *     responses:
  *       200:
  *         description: User updated
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 updated:
+ *                   type: boolean
+ *               example:
+ *                 updated: true
  *       400:
  *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: "Invalid input: Email format is incorrect."
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: "User not found"
  *       500:
  *         description: Internal server error
  */
-router.put('/:id', userController.updateUser); 
+router.put('/:id', userController.updateUser);
 
 /**
  * @swagger
- * /{id}/password:
+ * /users/{id}/password:
  *   put:
  *     summary: Update a user's password
  *     parameters:
@@ -177,10 +284,37 @@ router.put('/:id', userController.updateUser);
  *     responses:
  *       200:
  *         description: Password updated successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 updated:
+ *                   type: boolean
+ *               example:
+ *                 updated: true
  *       400:
  *         description: Invalid input
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: "Invalid input: Password must be at least 8 characters."
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: "User not found"
  *       500:
  *         description: Internal server error
  */
@@ -188,7 +322,7 @@ router.put('/:id/password', userController.updateUserPassword);
 
 /**
  * @swagger
- * /{id}:
+ * /users/{id}:
  *   delete:
  *     summary: Delete a user by ID
  *     parameters:
@@ -203,14 +337,23 @@ router.put('/:id/password', userController.updateUserPassword);
  *         description: User deleted
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: "User not found"
  *       500:
  *         description: Internal server error
  */
-router.delete('/:id', userController.deleteUser); 
+router.delete('/:id', userController.deleteUser);
 
 /**
  * @swagger
- * /{id}/deactivate:
+ * /users/{id}/deactivate:
  *   delete:
  *     summary: Deactivate a user by ID (soft delete)
  *     parameters:
@@ -225,6 +368,15 @@ router.delete('/:id', userController.deleteUser);
  *         description: User deactivated
  *       404:
  *         description: User not found
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 error:
+ *                   type: string
+ *               example:
+ *                 error: "User not found"
  *       500:
  *         description: Internal server error
  */

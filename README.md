@@ -8,17 +8,18 @@ Projekt treh prijateljev, ki želijo opraviti predmet SUA. Zgradili bodo aplikac
 
 ### 1. User Management Service (NestJS)
 - **Responsibilities:**
-  - User registration and authentication
-  - Profile management
-  - JWT token handling
-  - User preferences storage
-- **Database:** PostgreSQL
+  - User managment
+- **Database:** SQLite
 - **Key APIs:**
-  - POST /auth/register
-  - POST /auth/login
-  - GET/PUT /users/profile
-  - GET /users/preferences
-- **Port:** 3000
+  - GET api/users
+  - GET api/users/{id}
+  - POST api/users
+  - POST api/users/bulk
+  - PUT api/users/{id}
+  - PUT api/users/{id}/password 
+  - DELETE api/users/{id}
+  - DELETE api/users/{id}/deactivate
+- **Port:** 4001
 
 ### 2. Book Catalog Service (FastAPI)
 - **Responsibilities:**

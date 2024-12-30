@@ -1,0 +1,31 @@
+services:
+  booksservice:
+    build:
+      context: ./BenjaminJeran/Backend
+      dockerfile: Dockerfile
+    ports:
+      - "3000:3000" 
+    networks:
+      - app-network
+
+  userservice:
+    build:
+      context: ./AlenSaruga/user-service
+      dockerfile: Dockerfile
+    ports:
+      - "4001:4001" 
+    networks:
+      - app-network
+
+  inventoryservice:
+    build:
+      context: ./AlenSaruga/inventory-service
+      dockerfile: Dockerfile
+    ports:
+      - "4002:4002" 
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

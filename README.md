@@ -6,7 +6,7 @@ Projekt treh prijateljev, ki želijo opraviti predmet SUA. Zgradili bodo aplikac
 
 ## Service Breakdown
 
-### 1. User Management Service (NestJS)
+### 1. User Management Service (Express)
 - **Responsibilities:**
   - User managment
 - **Database:** SQLite
@@ -19,6 +19,21 @@ Projekt treh prijateljev, ki želijo opraviti predmet SUA. Zgradili bodo aplikac
   - PUT api/users/{id}/password 
   - DELETE api/users/{id}
   - DELETE api/users/{id}/deactivate
+- **Port:** 4001
+
+### 1. User Management Service (Express)
+- **Responsibilities:**
+  - Inventory managment
+- **Database:** SQLite
+- **Key APIs:**
+  - GET api/inventory
+  - GET api/inventory/{id}
+  - POST api/inventory
+  - POST api/inventory/bulk
+  - PUT api/inventory/{id}
+  - PUT api/inventory/{id}/increment 
+  - DELETE api/inventory/{id}
+  - DELETE api/inventory/book/{bookid}
 - **Port:** 4001
 
 ### 2. Book Catalog Service (FastAPI)
@@ -83,7 +98,10 @@ bookstore/
 │   └── svelte-app/
 ├── user-service/
 │   ├── Dockerfile
-│   └── nest-app/
+│   └── express-app/
+├── inventory-service/
+│   ├── Dockerfile
+│   └── express-app/
 ├── book-service/
 │   ├── Dockerfile
 │   └── fastapi-app/

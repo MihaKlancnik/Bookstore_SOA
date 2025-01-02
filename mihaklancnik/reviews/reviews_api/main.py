@@ -4,6 +4,12 @@ from fastapi import FastAPI, HTTPException, Request
 from pydantic import BaseModel
 from datetime import datetime
 import uvicorn
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+geslo = os.environ.get("MihaGeslo")
 
 class Review(BaseModel):
     book_id: int
@@ -19,7 +25,7 @@ app = FastAPI(
 )
 
 # MongoDB connection
-MONGODB_URI = "mongodb+srv://mihaklancnik2:$MONGOGESLO@ptscluster.qfts7.mongodb.net/?retryWrites=true&w=majority&appName=PTSCLUSTER"  
+MONGODB_URI = "mongodb+srv://moji_prijatelji:knjigarna@ptscluster.qfts7.mongodb.net/?retryWrites=true&w=majority&appName=PTSCLUSTER"  
 client = AsyncIOMotorClient(MONGODB_URI)
 db = client["SOA"]
 clan = db["reviews"]
@@ -231,5 +237,3 @@ async def update_review_rating(review_id: str, rating: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
-if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8080, reload=True)

@@ -3,8 +3,15 @@ from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import List
 
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+geslo = os.environ.get("MihaGeslo")
+
 # MongoDB connection
-MONGODB_URI = "mongodb+srv://mihaklancnik2:$MONGOGESLO@ptscluster.qfts7.mongodb.net/?retryWrites=true&w=majority&appName=PTSCLUSTER"
+MONGODB_URI = "mongodb+srv://moji_prijatelji:knjigarna@ptscluster.qfts7.mongodb.net/?retryWrites=true&w=majority&appName=PTSCLUSTER"
 client = AsyncIOMotorClient(MONGODB_URI)
 db = client["SOA"]
 order_collection = db["orders"]
@@ -28,7 +35,7 @@ class Order(BaseModel):
                 "book_id": "book3",
                 "quantity": 3,
                 "price": 15.99
-            }
+                }
         }
 
 # CREATE operation (Insert a new order)

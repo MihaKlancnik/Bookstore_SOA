@@ -37,7 +37,7 @@ services:
 
   reviewservice: 
     build:
-      context: ./mihaklancnik/reviews/reviews-api
+      context: ./mihaklancnik/reviews/reviews_api
       dockerfile: Dockerfile
     ports:
       - "2000:2000"
@@ -46,7 +46,7 @@ services:
 
   orderservice: 
     build:
-      context: ./mihaklancnik/order-api
+      context: ./mihaklancnik/order_api
       dockerfile: Dockerfile
     ports:
       - "2001:2001"

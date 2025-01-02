@@ -5,7 +5,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /inventory:
+ * /:
  *   get:
  *     summary: Get all inventory items
  *     responses:
@@ -48,7 +48,7 @@ router.get('/', inventoryController.getAllInventory);
 
 /**
  * @swagger
- * /inventory/{id}:
+ * /{id}:
  *   get:
  *     summary: Get an inventory item by ID
  *     parameters:
@@ -98,7 +98,7 @@ router.get('/:id', inventoryController.getInventoryById);
 
 /**
  * @swagger
- * /inventory:
+ * /:
  *   post:
  *     summary: Create a new inventory item
  *     requestBody:
@@ -143,7 +143,7 @@ router.post('/', inventoryController.createInventoryItem);
 
 /**
  * @swagger
- * /inventory/bulk:
+ * /bulk:
  *   post:
  *     summary: Add multiple inventory items in bulk
  *     requestBody:
@@ -194,7 +194,7 @@ router.post('/bulk', inventoryController.postBulkInventoryItems);
 
 /**
  * @swagger
- * /inventory/{id}:
+ * /{id}:
  *   put:
  *     summary: Update an inventory item
  *     parameters:
@@ -242,9 +242,9 @@ router.put('/:id', inventoryController.updateInventoryItem);
 
 /**
  * @swagger
- * /inventory/{id}/increment:
+ * /{id}/decrement:
  *   put:
- *     summary: Increment the quantity of an inventory item
+ *     summary: Decrement the quantity of an inventory item
  *     parameters:
  *       - in: path
  *         name: id
@@ -258,20 +258,20 @@ router.put('/:id', inventoryController.updateInventoryItem);
  *           schema:
  *             type: object
  *             properties:
- *               incrementAmount:
+ *               decrementAmount:
  *                 type: integer
  *             examples:
  *               example1:
- *                 summary: Increment by 5
+ *                 summary: Decrement by 5
  *                 value:
- *                   incrementAmount: 5
+ *                   decrementAmount: 5
  *               example2:
- *                 summary: Increment by 10
+ *                 summary: Decrement by 10
  *                 value:
- *                   incrementAmount: 10
+ *                   decrementAmount: 10
  *     responses:
  *       200:
- *         description: Inventory item quantity incremented
+ *         description: Inventory item quantity decremented
  *         content:
  *           application/json:
  *             schema:
@@ -281,15 +281,15 @@ router.put('/:id', inventoryController.updateInventoryItem);
  *                   type: boolean
  *             examples:
  *               example1:
- *                 summary: Example response for successful increment
+ *                 summary: Example response for successful decrement
  *                 value:
  *                   updated: true
  */
-router.put('/:id/increment', inventoryController.incrementInventoryQuantity);
+router.put('/:id/decrement', inventoryController.decrementInventoryQuantity);
 
 /**
  * @swagger
- * /inventory/{id}:
+ * /{id}:
  *   delete:
  *     summary: Delete an inventory item
  *     parameters:
@@ -332,7 +332,7 @@ router.delete('/:id', inventoryController.deleteInventoryItem);
 
 /**
  * @swagger
- * /inventory/book/{bookId}:
+ * /book/{bookId}:
  *   delete:
  *     summary: Delete all inventory items by book ID
  *     parameters:

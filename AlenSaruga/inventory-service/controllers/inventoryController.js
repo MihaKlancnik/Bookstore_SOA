@@ -70,20 +70,20 @@ exports.updateInventoryItem = async (req, res) => {
     }
 };
 
-exports.incrementInventoryQuantity = async (req, res) => {
+exports.decrementInventoryQuantity = async (req, res) => {
     const { id } = req.params;
-    const { incrementAmount } = req.body;
-    if (incrementAmount === undefined) {
-        return res.status(400).json({ error: 'Increment amount is required' });
+    const { decrementAmount } = req.body;
+    if (decrementAmount === undefined) {
+        return res.status(400).json({ error: 'decrement amount is required' });
     }
     try {
-        const updated = await inventoryModel.incrementInventoryQuantity(id, incrementAmount);
+        const updated = await inventoryModel.decrementInventoryQuantity(id, decrementAmount);
         if (!updated) {
             return res.status(404).json({ error: 'Inventory item not found' }); 
         }
-        res.status(200).json({ message: 'Inventory item quantity incremented successfully.' }); 
+        res.status(200).json({ message: 'Inventory item quantity decrementsuccessfully.' }); 
     } catch (err) {
-        console.error('Error incrementing inventory quantity:', err.message);
+        console.error('Error decrementing inventory quantity:', err.message);
         res.status(500).json({ error: err.message });
     }
 };

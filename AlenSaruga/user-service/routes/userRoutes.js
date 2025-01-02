@@ -5,7 +5,7 @@ const router = express.Router();
 
 /**
  * @swagger
- * /users:
+ * /:
  *   get:
  *     summary: Get all users
  *     responses:
@@ -190,7 +190,7 @@ router.post('/bulk', userController.createMultipleUsers);
 
 /**
  * @swagger
- * /users/{id}:
+ * /{id}:
  *   put:
  *     summary: Update a user by ID
  *     parameters:
@@ -260,7 +260,7 @@ router.put('/:id', userController.updateUser);
 
 /**
  * @swagger
- * /users/{id}/password:
+ * /{id}/password:
  *   put:
  *     summary: Update a user's password
  *     parameters:
@@ -322,7 +322,7 @@ router.put('/:id/password', userController.updateUserPassword);
 
 /**
  * @swagger
- * /users/{id}:
+ * /{id}:
  *   delete:
  *     summary: Delete a user by ID
  *     parameters:
@@ -353,7 +353,7 @@ router.delete('/:id', userController.deleteUser);
 
 /**
  * @swagger
- * /users/{id}/deactivate:
+ * /{id}/deactivate:
  *   delete:
  *     summary: Deactivate a user by ID (soft delete)
  *     parameters:

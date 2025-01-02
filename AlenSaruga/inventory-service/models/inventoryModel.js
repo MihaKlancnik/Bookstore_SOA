@@ -54,14 +54,14 @@ exports.updateInventoryItem = (id, quantity) => {
     });
 };
 
-exports.incrementInventoryQuantity = (id, incrementAmount) => {
+exports.decrementInventoryQuantity = (id, decrementAmount) => {
     return new Promise((resolve, reject) => {
         const query = `
             UPDATE inventory
-            SET quantity = quantity + ?, updated_at = datetime('now')
+            SET quantity = quantity - ?, updated_at = datetime('now')
             WHERE id = ?
         `;
-        db.run(query, [incrementAmount, id], function (err) {
+        db.run(query, [decrementAmount, id], function (err) {
             if (err) return reject(err);
             resolve(this.changes);
         });

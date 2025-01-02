@@ -1,5 +1,6 @@
 const express = require('express');
 const db = require('../database'); 
+const axios = require('axios');
 
 const router = express.Router();
 
@@ -246,7 +247,164 @@ router.delete('/:id', (req, res) => {
 });
 
 
+/**
+ * @swagger
+ * /books/{id}/reviews:
+ *   get:
+ *     summary: Retrieve reviews for a specific book
+ *     description: Fetches reviews for a book by its ID by calling the Reviews service.
+ *     tags:
+ *       - Books
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the book
+ *     responses:
+ *       200:
+ *         description: A list of reviews for the book
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 book:
+ *                   $ref: '#/components/schemas/Book'
+ *                 reviews:
+ *                   type: array
+ *                   items:
+ *                     type: object
+ *                     properties:
+ *                       id:
+ *                         type: string
+ *                       user_id:
+ *                         type: integer
+ *                       rating:
+ *                         type: integer
+ *                       comment:
+ *                         type: string
+ *                       created_at:
+ *                         type: string
+ *                         format: date-time
+ *       404:
+ *         description: Book not found or no reviews available
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/:id/reviews', async (req, res) => {
+    const bookId = req.params.id;
 
+    try {
+        // Verify the book exists in the database
+        const bookQuery = 'SELECT * FROM books WHERE id = ?';
+        db.get(bookQuery, [bookId], async (err, book) => {
+            if (err) {
+                console.error('Error fetching book:', err.message);
+                return res.status(500).json({ error: err.message });
+            }
+
+            if (!book) {
+                return res.status(404).json({ error: 'Book not found' });
+            }
+
+            try {
+                const reviewsResponse = await axios.get(`http://reviewservice:2000/reviews/book/${bookId}`);
+                const reviews = reviewsResponse.data;
+
+                res.json({ book, reviews });
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    res.status(404).json({ error: `No reviews found for book with ID ${bookId}` });
+                } else {
+                    console.error('Error fetching reviews:', error.message);
+                    res.status(500).json({ error: 'Unable to fetch reviews' });
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
+
+
+
+/**
+ * @swagger
+ * /books/{id}/inventory:
+ *   get:
+ *     summary: Retrieve inventory size for a specific book
+ *     description: Fetches the inventory size of a book by its ID by calling the Inventory service.
+ *     tags:
+ *       - Books
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         schema:
+ *           type: integer
+ *         required: true
+ *         description: The ID of the book
+ *     responses:
+ *       200:
+ *         description: Inventory size for the book
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 book_id:
+ *                   type: integer
+ *                   description: The ID of the book
+ *                 inventory:
+ *                   type: integer
+ *                   description: The available inventory size for the book
+ *       404:
+ *         description: Book not found or inventory data unavailable
+ *       500:
+ *         description: Internal server error
+ */
+router.get('/:id/inventory', async (req, res) => {
+    const bookId = req.params.id;
+
+    try {
+        // Verify the book exists in the database
+        const bookQuery = 'SELECT * FROM books WHERE id = ?';
+        db.get(bookQuery, [bookId], async (err, book) => {
+            if (err) {
+                console.error('Error fetching book:', err.message);
+                return res.status(500).json({ error: err.message });
+            }
+
+            if (!book) {
+                return res.status(404).json({ error: 'Book not found' });
+            }
+
+            try {
+                // Fetch inventory size from the Inventory microservice
+                const inventoryResponse = await axios.get(`http://inventoryservice:4002/api/inventory/${bookId}`);
+                const inventory = inventoryResponse.data;
+
+                // Respond with inventory quantity
+                res.json({
+                    book_id: bookId,
+                    inventory: inventory.quantity || 0, // Use the `quantity` field from the inventory response
+                });
+            } catch (error) {
+                if (error.response && error.response.status === 404) {
+                    res.status(404).json({ error: `No inventory data found for book with ID ${bookId}` });
+                } else {
+                    console.error('Error fetching inventory data:', error.message);
+                    res.status(500).json({ error: 'Unable to fetch inventory data' });
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error:', error.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+});
 
 /**
  * @swagger
@@ -313,7 +471,5 @@ router.delete('/:id', (req, res) => {
  *         stock: 15
  *         description: "An insightful book."
  */
-
-
 
 module.exports = router;

@@ -35,6 +35,27 @@ services:
     networks:
       - app-network
 
+  reviewservice: 
+    build:
+      context: ./mihaklancnik/reviews/reviews-api
+      dockerfile: Dockerfile
+    ports:
+      - "2000:2000"
+    networks:
+      - app-network
+
+  orderservice: 
+    build:
+      context: ./mihaklancnik/order-api
+      dockerfile: Dockerfile
+    ports:
+      - "2001:2001"
+    networks:
+      - app-network
+
+
+  
+
 networks:
   app-network:
     driver: bridge

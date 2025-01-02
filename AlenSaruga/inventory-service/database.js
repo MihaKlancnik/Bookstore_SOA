@@ -58,7 +58,7 @@ function initializeDatabase() {
             console.error('Error creating table:', err.message);
         } else {
             console.log('Table created successfully.');
-            //addDummyData();
+            addDummyData();
         }
     });
 }

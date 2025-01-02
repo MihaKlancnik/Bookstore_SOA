@@ -61,7 +61,7 @@ function initializeDatabase() {
             console.error('Error creating table:', err.message);
         } else {
             console.log('Database schema initialized successfully.');
-            //addDummyData();
+            addDummyData();
         }
     });
 }

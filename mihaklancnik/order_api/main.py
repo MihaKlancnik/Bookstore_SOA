@@ -2,7 +2,7 @@ from fastapi import FastAPI, HTTPException, Query, status
 from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import List
-
+import httpx
 import os
 from dotenv import load_dotenv
 
@@ -151,3 +151,65 @@ async def get_orders_by_quantity(min_quantity: int):
         raise HTTPException(status_code=404, detail="No orders found with quantity greater than specified value")
 
     return orders
+
+
+
+@app.post("/orders/", response_model=Order, status_code=status.HTTP_201_CREATED,
+          summary="Create a new order and update inventory", tags=["Orders"],
+          responses={201: {"description": "Order created", "model": Order},
+                     400: {"description": "Bad Request"},
+                     404: {"description": "Book not found in inventory"},
+                     500: {"description": "Internal Server Error"}})
+async def create_order(order: Order):
+    """
+    Create a new order in the system, decrement inventory, and insert the order into the database.
+
+    - **order_id**: The unique ID of the order (required)
+    - **book_id**: The ID of the book (required)
+    - **quantity**: The quantity of the book (required, must be greater than 0)
+    - **price**: The price of the book (required, must be greater than 0)
+    """
+    # Convert book_id to int for inventory API
+    try:
+        inventory_book_id = int(order.book_id)
+    except ValueError:
+        raise HTTPException(status_code=400, detail="Invalid book_id format")
+
+    # Define inventory API URLs
+    inventory_get_url = f"http://localhost:4002/api/inventory/{inventory_book_id}"
+    inventory_decrement_url = f"http://localhost:4002/api/inventory/{inventory_book_id}/decrement"
+
+    async with httpx.AsyncClient() as client:
+        # Step 1: Fetch current inventory
+        inventory_response = await client.get(inventory_get_url)
+
+        if inventory_response.status_code == 404:
+            raise HTTPException(status_code=404, detail="Book not found in inventory")
+        elif inventory_response.status_code != 200:
+            raise HTTPException(status_code=500, detail="Failed to fetch inventory")
+
+        inventory_data = inventory_response.json()
+        available_quantity = inventory_data.get("quantity")
+
+        if available_quantity is None:
+            raise HTTPException(status_code=500, detail="Invalid inventory response")
+
+        # Step 2: Check if there's enough inventory
+        if available_quantity < order.quantity:
+            raise HTTPException(status_code=400, detail="Not enough inventory available")
+
+        # Step 3: Decrement inventory
+        decrement_payload = {"decrementAmount": order.quantity}
+        decrement_response = await client.put(inventory_decrement_url, json=decrement_payload)
+
+        if decrement_response.status_code == 404:
+            raise HTTPException(status_code=404, detail="Book not found in inventory")
+        elif decrement_response.status_code != 200:
+            raise HTTPException(status_code=500, detail="Failed to decrement inventory")
+
+    # Step 4: Create the order
+    order_dict = order.dict()
+    result = await order_collection.insert_one(order_dict)
+    order_dict["_id"] = str(result.inserted_id)
+
+    return order_dict

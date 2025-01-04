@@ -4,7 +4,7 @@
     <h2 class="text-2xl font-bold text-center text-gray-700">Prijava</h2>
     <div class="mt-4">
       <div>
-        <label class="block text-sm text-gray-600" for="email">Mail</label>
+        <label class="block text-sm text-gray-600" for="email">E-Mail</label>
         <input 
           type="email" 
           id="email" 
@@ -34,6 +34,10 @@
     <p class="mt-4 text-sm text-center text-gray-600">
       Še nimaš računa?
       <a href="/nekineki" class="text-blue-500 hover:underline">Registriraj se tu</a>
+      
+    <p class="mt-4 text-sm text-center text-gray-600">
+      <a href="/app/books" class="text-blue-500 text-lg hover:underline">Nadaljuj brez prijave</a>
     </p>
+  
   </div>
 </div>

@@ -1,6 +1,12 @@
 export const loginState = $state({
     email: 'Test',
     password: 'Test',
-    jwtToken: '' 
+    jwtToken: 'hahahaha' 
+  });
+
+  export const createAccountState = $state({
+    email: '',
+    username: '',
+    password: ''
   });
 

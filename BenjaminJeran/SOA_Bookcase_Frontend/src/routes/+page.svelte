@@ -55,7 +55,7 @@
         />
       </div>
       <div class="flex items-center justify-between mt-4">
-        <a href="/nekineki" class="text-sm text-blue-500 hover:underline">Pozabljeno geslo?</a>
+        <a href="/" class="text-sm text-blue-500 hover:underline">Pozabljeno geslo?</a>
         <button 
           type="submit" 
           on:click={handleSubmit}
@@ -68,7 +68,7 @@
     </div>
     <p class="mt-4 text-sm text-center text-gray-600">
       Še nimaš računa?
-      <a href="/nekineki" class="text-blue-500 hover:underline">Registriraj se tu</a>
+      <a href="/register" class="text-blue-500 hover:underline">Registriraj se tu</a>
       
     <p class="mt-4 text-sm text-center text-gray-600">
       <a href="/app/books" class="text-blue-500 text-lg hover:underline">Nadaljuj brez prijave</a>

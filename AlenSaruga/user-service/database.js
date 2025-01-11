@@ -50,7 +50,8 @@ function initializeDatabase() {
     email TEXT NOT NULL UNIQUE,           
     password TEXT NOT NULL,               
     phone TEXT,                           
-    address TEXT,                         
+    address TEXT,
+    role TEXT DEFAULT 'user',                         
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP, 
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

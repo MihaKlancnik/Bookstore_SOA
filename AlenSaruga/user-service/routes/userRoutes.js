@@ -81,7 +81,7 @@ const router = express.Router();
  *                   type: string
  *                   description: Error message for server issues.
  */
-router.get('/login', userController.login);
+router.post('/login', userController.login);
 
 
 /**

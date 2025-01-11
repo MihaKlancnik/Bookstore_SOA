@@ -237,3 +237,29 @@ async def update_review_rating(review_id: str, rating: int):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
+@app.get("/reviews/user/{user_id}", tags=["Reviews"])
+async def get_reviews_by_user(user_id: int):
+    """
+    Get all reviews by a specific user.
+    - **Path**: `/reviews/user/{user_id}`
+    - **Parameters**: user_id (int)
+    - **Returns**: A list of reviews made by the specified user.
+    - **Responses**:
+        - 200: Successfully retrieved reviews for the user.
+        - 404: No reviews found for the specified user.
+        - 500: Internal server error.
+    """
+    try:
+        reviews_cursor = clan.find({"user_id": user_id})
+        reviews = await reviews_cursor.to_list(None)
+        if not reviews:
+            raise HTTPException(status_code=404, detail=f"No reviews found for user_id: {user_id}")
+        reviews_list = []
+        for review in reviews:
+            review_dict = {**review}
+            review_dict["id"] = str(review_dict["_id"])
+            del review_dict["_id"]
+            reviews_list.append(review_dict)
+        return reviews_list
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")

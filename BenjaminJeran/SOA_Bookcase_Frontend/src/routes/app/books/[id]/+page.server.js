@@ -6,7 +6,7 @@ export async function load({ params }) {
     console.log(id);
 
     try {
-        const response = await fetch(`http://localhost:3000/api/books/${id}`);
+        const response = await fetch(`http://localhost:3000/api/books/${id}/reviews`);
 
         if (!response.ok) {
             throw new Error(`Failed to fetch book with ID: ${id}`);

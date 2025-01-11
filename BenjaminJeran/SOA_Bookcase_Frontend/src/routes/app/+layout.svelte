@@ -1,15 +1,15 @@
 <script>
 	let { children } = $props();
-    import { loginState } from '$lib/state.svelte.js';
+    import { loginState, UserState } from '$lib/state.svelte.js';
+    import { goto } from '$app/navigation';
 
     const logout = () => {
-        console.log(loginState.jwtToken);
         loginState.jwtToken = '';
-       /*  localStorage.removeItem('jwt_token');
-        console.log('Odjava je bila uspešna'); */
-        console.log(loginState.jwtToken);
-      /*   window.location.href = '/'; */
-    };
+        loginState.email = '';
+        loginState.password = '';
+        localStorage.removeItem('jwt_token');
+        goto(`/`) 
+    }
 
 </script>
 
@@ -17,10 +17,9 @@
     <a href="/" class="text-white text-2xl font-bold">Knjigarna</a>
 
     <div class="flex space-x-6">
-        <a href="/" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Domov</a>
         <a href="/app/books" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Knjige</a>
         <a href="/app/cart" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Košarica</a>
-        {#if loginState.jwtToken !== ''}
+        {#if UserState.role === 'admin'}
             <a href="/app/user" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Uporabnik</a>
         {/if}
     </div>

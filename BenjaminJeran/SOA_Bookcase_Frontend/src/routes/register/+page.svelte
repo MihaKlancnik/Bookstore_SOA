@@ -23,10 +23,10 @@
  </script>
  
  <div class="flex flex-col items-center justify-center h-screen">
-   <h1 class="text-4xl mb-10">Ustvari Račun</h1>
+   <h1 class="text-4xl mb-10">Ustvari račun</h1>
    <div class="max-w-md w-full bg-white p-6 rounded-lg shadow-md">
      <h2 class="text-2xl font-bold text-center text-gray-700">Registracija</h2>
-     <div class="mt-4">
+     <div class="mt-4 flex flex-col space-y-4">
        <div>
          <label class="block text-sm text-gray-600" for="username">Uporabniško ime</label>
          <input 
@@ -61,7 +61,7 @@
          <button 
            type="submit" 
            on:click={handleCreateAccount}
-           class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+           class="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
          >
            Registracija
          </button>

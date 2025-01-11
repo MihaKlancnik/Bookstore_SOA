@@ -3,9 +3,11 @@ const express = require('express');
 const userRoutes = require('./routes/userRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+const cors = require('cors');
 
 
 const app = express();
+app.use(cors());
 const PORT = 4001;
 
 const swaggerOptions = {
@@ -24,6 +26,8 @@ const swaggerOptions = {
     },
     apis: ['./routes/*.js'],
 };
+
+
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));

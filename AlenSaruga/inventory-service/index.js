@@ -2,8 +2,10 @@ const express = require('express');
 const inventoryRoutes = require('./routes/inventoryRoutes');
 const swaggerUi = require('swagger-ui-express');
 const swaggerJsDoc = require('swagger-jsdoc');
+const cors = require('cors');
 
 const app = express();
+app.use(cors());
 const PORT = 4002;
 
 const swaggerOptions = {

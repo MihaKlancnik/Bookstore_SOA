@@ -5,6 +5,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "3000:3000" 
+    volumes:
+      - ./books.db:/usr/src/app/books.db
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
     networks:
       - app-network
 
@@ -14,6 +18,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4001:4001" 
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
     networks:
       - app-network
 
@@ -23,6 +29,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4002:4002" 
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
     networks:
       - app-network
 
@@ -32,6 +40,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5173:5173"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
     networks:
       - app-network
 
@@ -41,6 +51,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "2000:2000"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
     networks:
       - app-network
 
@@ -50,11 +62,10 @@ services:
       dockerfile: Dockerfile
     ports:
       - "2001:2001"
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
     networks:
       - app-network
-
-
-  
 
 networks:
   app-network:

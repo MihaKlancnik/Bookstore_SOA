@@ -1,32 +1,66 @@
 <script>
+	import { goto } from '$app/navigation';
    import { loginState } from '$lib/state.svelte.js';
+   import { UserState } from '$lib/state.svelte.js';
 
-  async function handleSubmit() {
-    const { email, password } = loginState;
-    try {
-          
-      const res = await fetch('http://localhost:4001/api/login', {
-          method: 'POST',
-          body: JSON.stringify({ email, password }),
-          headers: { 'Content-Type': 'application/json' }
-        });
+   async function handleSubmit() {
+  const { email, password } = loginState;
 
-    } 
-    catch (error) {
-       console.log(loginState.email)
-       console.log(loginState.password)
-    }
-   
+  try {
+    const res = await fetch('http://localhost:4001/api/users/login', {
+      method: 'POST',
+      body: JSON.stringify({ email, password }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+
     if (res.ok) {
       const { token } = await res.json();
-      loginState.jwtToken = token; 
-      localStorage.setItem('jwt_token', token); 
-      console.log('Prijava je bila uspešna');
+
+      if (isJwtValid(token)) {
+        loginState.jwtToken = token;
+        localStorage.setItem('jwt_token', token);
+        console.log('Prijava je bila uspešna');
+
+        const decodedPayload = JSON.parse(atob(token.split('.')[1]));
+
+        UserState.name = decodedPayload.name;
+        UserState.role = decodedPayload.role
+
+        if (decodedPayload.role === 'admin') {
+          console.log('User is an admin');
+        } 
+
+        goto(`/app/books`);
+
+      } else {
+        console.error('Napacen ali potekel token');
+        alert('Seja je potekla. Prosimo, prijavite se ponovno.');
+      }
     } else {
-     
       console.error('Prijava ni bila uspešna');
+      alert('Prijava ni bila uspešna. Prosimo, poskusite ponovno.');
     }
+  } catch (error) {
+    console.error('Napaka', error);
+    alert('Nekaj je šlo narobe. Prosimo, poskusite ponovno.');
   }
+}
+
+
+function isJwtValid(token) {
+  try {
+    const [header, payload, signature] = token.split('.');
+    const decodedPayload = JSON.parse(atob(payload));
+    const currentTime = Math.floor(Date.now() / 1000);
+
+    return decodedPayload.exp && decodedPayload.exp > currentTime;
+  } catch (error) {
+    console.error('Invalid JWT:', error);
+    return false;
+  }
+}
+
+
 </script>
 
 <div class="flex flex-col items-center justify-center h-screen ">
@@ -55,24 +89,18 @@
         />
       </div>
       <div class="flex items-center justify-between mt-4">
-        <a href="/" class="text-sm text-blue-500 hover:underline">Pozabljeno geslo?</a>
         <button 
           type="submit" 
           on:click={handleSubmit}
-          class="px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
+          class="w-full px-4 py-2 text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-50"
         >
           Prijava
-         
         </button>
       </div>
     </div>
     <p class="mt-4 text-sm text-center text-gray-600">
       Še nimaš računa?
       <a href="/register" class="text-blue-500 hover:underline">Registriraj se tu</a>
-      
-    <p class="mt-4 text-sm text-center text-gray-600">
-      <a href="/app/books" class="text-blue-500 text-lg hover:underline">Nadaljuj brez prijave</a>
-    </p>
-  
+
   </div>
 </div>

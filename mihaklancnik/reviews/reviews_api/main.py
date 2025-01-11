@@ -104,6 +104,8 @@ async def create_review(review: Review):
         return {"id": str(result.inserted_id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+    
+    
 
 @app.put("/reviews/{review_id}", tags=["Reviews"])
 async def update_review(review_id: str, review: Review):

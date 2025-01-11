@@ -1,6 +1,16 @@
 <script>
 	let { children } = $props();
     import { loginState } from '$lib/state.svelte.js';
+
+    const logout = () => {
+        console.log(loginState.jwtToken);
+        loginState.jwtToken = '';
+       /*  localStorage.removeItem('jwt_token');
+        console.log('Odjava je bila uspešna'); */
+        console.log(loginState.jwtToken);
+      /*   window.location.href = '/'; */
+    };
+
 </script>
 
 <nav class="flex justify-between items-center bg-indigo-600 p-4 shadow-lg">
@@ -10,7 +20,9 @@
         <a href="/" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Domov</a>
         <a href="/app/books" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Knjige</a>
         <a href="/app/cart" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Košarica</a>
-        <a href="/app/user" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Uporabnik</a>
+        {#if loginState.jwtToken !== ''}
+            <a href="/app/user" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Uporabnik</a>
+        {/if}
     </div>
 
     <div class="flex items-center space-x-4">
@@ -20,6 +32,7 @@
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/>
             </svg>
         </a>
+        <button class="text-white hover:text-indigo-200" onclick={logout}>Odjava</button>
     </div>
 </nav>
 {@render children()}

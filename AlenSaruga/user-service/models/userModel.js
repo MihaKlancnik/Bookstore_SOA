@@ -1,11 +1,40 @@
 const bcrypt = require('bcrypt');
 const db = require('../database');
 
-exports.getUserByEmail = (email, callback) => {
+exports.getUserByEmail = (email, password, callback) => {
     db.get(`SELECT * FROM users WHERE email = ?`, [email], (err, row) => {
-        callback(err, row);
+        if (err) {
+            console.error('Database query error:', err.message);
+            callback(err, null);
+            return;
+        }
+
+        if (!row) {
+            console.warn('User not found for email:', email);
+            callback(new Error('User not found'), null);
+            return;
+        }
+
+        bcrypt.compare(password, row.password, (compareErr, isMatch) => {
+            if (compareErr) {
+                console.error('Error comparing passwords:', compareErr.message);
+                callback(compareErr, null);
+                return;
+            }
+
+            if (!isMatch) {
+                console.warn('Invalid password for email:', email);
+                callback(new Error('Invalid password'), null);
+                return;
+            }
+
+            console.info('User authenticated successfully:', email);
+            callback(null, row);
+        });
     });
 };
+
+
 
 exports.getAllUsers = (callback) => {
     db.all(`SELECT * FROM users`, [], (err, rows) => {

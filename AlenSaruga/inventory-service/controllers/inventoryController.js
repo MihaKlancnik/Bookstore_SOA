@@ -30,6 +30,22 @@ exports.createInventoryItem = async (req, res) => {
         return res.status(400).json({ error: 'Book ID and quantity are required' }); 
     }
     try {
+        const getbookResponse = await axios.get('http://localhost:3000/books/' + book_id);
+
+        if (getbookResponse.status !== 200) {
+            return res.status(400).json({ error: 'Book not found' });
+        }
+        const book = getbookResponse.data;
+        if (book.quantity === undefined) {
+                return res.status(400).json({ error: 'Book quantity is required' });
+        }
+    }
+    catch (err) {
+        console.error('Error fetching book:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+
+    try {
         const itemId = await inventoryModel.createInventoryItem({ book_id, quantity });
         res.status(201).json({ id: itemId }); 
     } catch (err) {

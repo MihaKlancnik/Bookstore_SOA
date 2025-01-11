@@ -1,4 +1,60 @@
 const userModel = require('../models/userModel');
+const jwt = require('jsonwebtoken');
+
+const SECRET_KEY = process.env.SECRET_KEY;
+
+
+function generateUniqueToken() {
+    return 'id-' + Math.random().toString(36).substr(2, 9);
+}
+
+exports.login = async (req, res) => {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+        return res.status(400).json({ error: 'Username and password are required' });
+    }
+
+    try {
+        userModel.getUserByEmail(email, async (err, user) => {
+            if (err) {
+                return res.status(500).json({ error: 'Database error' });
+            }
+            if (!user) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+
+            if (user.password !== password) {
+                return res.status(401).json({ error: 'Invalid email or password' });
+            }
+
+            const currentTime = Math.floor(Date.now() / 1000);
+            const expirationTime = currentTime + (60 * 60);
+
+            const payload = {
+                "sub":  user.id,
+                "name": user.name,
+                "role": ["user"],
+                "iat": currentTime,
+                "exp": expirationTime,
+                "iss": "https://soa.abm.com",
+                jti: generateUniqueToken()
+            }
+
+            const token = jwt.sign(payload, SECRET_KEY, { algorithm: 'HS256' });
+
+            res.status(200).json({ token });
+        });
+
+    } catch (err) {
+        if (err.response && err.response.status === 404) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+        console.error('Error during login:', err.message);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
 
 exports.getAllUsers = (req, res) => {
     userModel.getAllUsers((err, users) => {

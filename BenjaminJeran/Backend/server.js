@@ -5,10 +5,12 @@ const dotenv = require('dotenv');
 const booksRouter = require('./routes/books');
 const { swaggerUi, swaggerDocs } = require('./swagger');
 const jwt = require('jsonwebtoken');
+const cors = require('cors');
 
 dotenv.config();
 
 const app = express();
+app.use(cors());
 const PORT = process.env.PORT || 3000;
 
 const verifyJWT = (req, res, next) => {

@@ -17,7 +17,10 @@
       const { token } = await res.json();
 
       if (isJwtValid(token)) {
+
+        console.log(token)
         loginState.jwtToken = token;
+
         localStorage.setItem('jwt_token', token);
         console.log('Prijava je bila uspešna');
 

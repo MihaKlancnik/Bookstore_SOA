@@ -2,7 +2,6 @@
 	import { goto } from '$app/navigation';
    import { loginState } from '$lib/state.svelte.js';
    import { UserState } from '$lib/state.svelte.js';
-   import VisitTracker from "$lib/VisitTracker.svelte";
    async function handleSubmit() {
    const { email, password } = loginState;
 
@@ -107,6 +106,3 @@ function isJwtValid(token) {
 
   </div>
 </div>
-
-
-<VisitTracker />

@@ -67,6 +67,15 @@ services:
     networks:
       - app-network
 
+  visittracker:
+    build:
+      context: ./BenjaminJeran/Storitev_obiski
+      dockerfile: Dockerfile
+    ports:
+      - "5000:5000" 
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

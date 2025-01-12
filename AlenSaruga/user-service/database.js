@@ -51,6 +51,7 @@ function initializeDatabase() {
     password TEXT NOT NULL,               
     phone TEXT,                           
     address TEXT,
+    reviews TEXT,
     role TEXT DEFAULT 'user',                         
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP, 
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP

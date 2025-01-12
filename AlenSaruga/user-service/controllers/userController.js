@@ -27,7 +27,7 @@ exports.login = async (req, res) => {
             }
 
             const currentTime = Math.floor(Date.now() / 1000);
-            const expirationTime = currentTime + 60 * 60; 
+            const expirationTime = currentTime + 60 * 60;
 
             const payload = {
                 sub: user.id,
@@ -60,14 +60,30 @@ exports.getAllUsers = (req, res) => {
     });
 };
 
-exports.getUserById = (req, res) => {
+exports.getUserById = async (req, res) => {
     const { id } = req.params;
-    userModel.getUserById(id, (err, user) => {
+    userModel.getUserById(id, async (err, user) => {
         if (err) {
             res.status(500).json({ error: err.message });
         } else if (!user) {
             res.status(404).json({ error: 'User not found' });
         } else {
+
+            try {
+                const getReviewsResponse = await axios.get('http://localhost:3000/reviews/user/' + user.id);
+
+                if (getbookResponse.status !== 200) {
+                    return res.status(400).json({ error: 'Book not found' });
+                }
+
+                const reviews = getReviewsResponse.data;
+
+                user.reviews = reviews;
+            }
+            catch (err) {
+                console.error('Error during login:', err.message);
+                return res.status(500).json({ error: 'Internal server error' });
+            }
             res.json(user);
         }
     });
@@ -104,9 +120,6 @@ exports.createMultipleUsers = (req, res) => {
         }
     });
 };
-
-
-
 
 exports.updateUser = (req, res) => {
     const { id } = req.params;

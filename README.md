@@ -127,24 +127,32 @@ bookstore/
 
 ## Database Schema Highlights
 
-1. **User Service (PostgreSQL)**
+1. **User Service (SQLite)**
 ```sql
-CREATE TABLE users (
-    id SERIAL PRIMARY KEY,
-    email VARCHAR(255) UNIQUE,
-    password_hash VARCHAR(255),
-    full_name VARCHAR(255),
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-);
-
-CREATE TABLE user_preferences (
-    user_id INTEGER REFERENCES users(id),
-    preferred_genres TEXT[],
-    email_notifications BOOLEAN DEFAULT true
+CREATE TABLE IF NOT EXISTS users (
+    id INTEGER PRIMARY KEY AUTOINCREMENT, 
+    name TEXT NOT NULL,                   
+    email TEXT NOT NULL UNIQUE,           
+    password TEXT NOT NULL,               
+    phone TEXT,                           
+    address TEXT,
+    reviews TEXT,
+    role TEXT DEFAULT 'user',                         
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP, 
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 ```
-
-2. **Book Service (MongoDB)**
+2. **Inventory Service (SQLite)**
+```sql
+CREATE TABLE IF NOT EXISTS inventory (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        book_id INTEGER NOT NULL,
+        quantity INTEGER NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+```
+3. **Book Service (MongoDB)**
 ```javascript
 {
   title: String,
@@ -162,7 +170,7 @@ CREATE TABLE user_preferences (
 }
 ```
 
-3. **Order Service (PostgreSQL)**
+4. **Order Service (PostgreSQL)**
 ```sql
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
@@ -180,7 +188,7 @@ CREATE TABLE order_items (
 );
 ```
 
-4. **Review Service (MongoDB)**
+5. **Review Service (MongoDB)**
 ```javascript
 {
   book_id: String,

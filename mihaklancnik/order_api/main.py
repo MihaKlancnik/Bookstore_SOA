@@ -1,15 +1,17 @@
-from fastapi import FastAPI, HTTPException, Query, status
+from fastapi import FastAPI, HTTPException, Query, status, Depends
 from pydantic import BaseModel, Field
 from motor.motor_asyncio import AsyncIOMotorClient
 from typing import List
 import httpx
 import os
 from dotenv import load_dotenv
-
+from fastapi_jwt_auth import AuthJWT
+from starlette.middleware.base import BaseHTTPMiddleware
 load_dotenv()
 
 geslo = os.environ.get("MihaGeslo")
-
+class Settings(BaseModel):
+    authjwt_secret_key: str = os.getenv("SECRET_KEY")
 # MongoDB connection
 MONGODB_URI = "mongodb+srv://moji_prijatelji:knjigarna@ptscluster.qfts7.mongodb.net/?retryWrites=true&w=majority&appName=PTSCLUSTER"
 client = AsyncIOMotorClient(MONGODB_URI)
@@ -20,6 +22,24 @@ app = FastAPI(
     title="Order Management API",
     description="API for managing orders",
     version="1.0.0",
+)
+app.config = Settings()
+
+def get_current_user(Authorize: AuthJWT = Depends()):
+    try:
+        # This will validate the token from the request headers
+        Authorize.jwt_required()
+
+        # Get the current user's information from the JWT
+        current_user = Authorize.get_jwt_subject()
+        return current_user
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Invalid or missing token")
+
+# Add middleware for JWT
+app.add_middleware(
+    BaseHTTPMiddleware,
+    dispatch=lambda request, call_next: call_next(request),
 )
 
 class Order(BaseModel):
@@ -39,20 +59,17 @@ class Order(BaseModel):
         }
 
 # CREATE operation (Insert a new order)
+# CREATE operation (Insert a new order)
 @app.post("/orders/", response_model=Order, status_code=status.HTTP_201_CREATED,
           summary="Create a new order", tags=["Orders"],
           responses={201: {"description": "Order created", "model": Order},
                      400: {"description": "Bad Request"}})
-async def create_order(order: Order):
+async def create_order(order: Order, current_user: str = Depends(get_current_user)):
     """
-    Create a new order in the system.
-
-    - **order_id**: The unique ID of the order (required)
-    - **book_id**: The ID of the book (required)
-    - **quantity**: The quantity of the book (required, must be greater than 0)
-    - **price**: The price of the book (required, must be greater than 0)
+    Create a new order in the system. 
     """
     order_dict = order.dict()
+    order_dict["user_id"] = current_user  # Store the current user ID in the order
     result = await order_collection.insert_one(order_dict)
     order_dict["_id"] = str(result.inserted_id)
     return order_dict
@@ -62,13 +79,11 @@ async def create_order(order: Order):
          summary="Get an order by order_id", tags=["Orders"],
          responses={200: {"description": "Order found", "model": Order},
                     404: {"description": "Order not found"}})
-async def read_order(order_id: int):
+async def read_order(order_id: int, current_user: str = Depends(get_current_user)):
     """
     Get the details of a specific order by its ID.
-
-    - **order_id**: The ID of the order to retrieve (required)
     """
-    order = await order_collection.find_one({"order_id": order_id})
+    order = await order_collection.find_one({"order_id": order_id, "user_id": current_user})
     if order:
         order["_id"] = str(order["_id"])  # Convert ObjectId to string
         return order
@@ -79,17 +94,12 @@ async def read_order(order_id: int):
          summary="Update an existing order", tags=["Orders"],
          responses={200: {"description": "Order updated", "model": Order},
                     404: {"description": "Order not found"}})
-async def update_order(order_id: int, updated_order: Order):
+async def update_order(order_id: int, updated_order: Order, current_user: str = Depends(get_current_user)):
     """
     Update an existing order.
-
-    - **order_id**: The ID of the order to update (required)
-    - **book_id**: The ID of the book (optional)
-    - **quantity**: The quantity of the book (optional, must be greater than 0)
-    - **price**: The price of the book (optional, must be greater than 0)
     """
     updated_data = {key: value for key, value in updated_order.dict().items() if value is not None}
-    result = await order_collection.update_one({"order_id": order_id}, {"$set": updated_data})
+    result = await order_collection.update_one({"order_id": order_id, "user_id": current_user}, {"$set": updated_data})
     if result.matched_count == 0:
         raise HTTPException(status_code=404, detail="Order not found")
     updated_order_dict = updated_order.dict()
@@ -101,13 +111,11 @@ async def update_order(order_id: int, updated_order: Order):
             summary="Delete an order by order_id", tags=["Orders"],
             responses={200: {"description": "Order deleted successfully"},
                        404: {"description": "Order not found"}})
-async def delete_order(order_id: int):
+async def delete_order(order_id: int, current_user: str = Depends(get_current_user)):
     """
     Delete an order by its ID.
-
-    - **order_id**: The ID of the order to delete (required)
     """
-    result = await order_collection.delete_one({"order_id": order_id})
+    result = await order_collection.delete_one({"order_id": order_id, "user_id": current_user})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Order not found")
     return {"message": "Order deleted successfully"}
@@ -116,12 +124,13 @@ async def delete_order(order_id: int):
 @app.get("/orders/", response_model=List[Order], status_code=status.HTTP_200_OK,
          summary="Get all orders", tags=["Orders"],
          responses={200: {"description": "List of orders", "model": List[Order]}})
-async def get_orders():
+
+async def get_orders(current_user: str = Depends(get_current_user)):
     """
     Get a list of all orders in the system.
     """
     orders = []
-    async for order in order_collection.find():
+    async for order in order_collection.find({"user_id": current_user}):  # Filter by user_id
         order["_id"] = str(order["_id"])  
         orders.append(order)
     return orders

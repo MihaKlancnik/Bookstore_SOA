@@ -1,22 +1,20 @@
 from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Depends
 from pydantic import BaseModel
 from datetime import datetime
 import uvicorn
 import os
 from dotenv import load_dotenv
+from fastapi_jwt_auth import AuthJWT
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.responses import JSONResponse
 
 load_dotenv()
 
-geslo = os.environ.get("MihaGeslo")
-
-class Review(BaseModel):
-    book_id: int
-    user_id: int
-    rating: int
-    comment: str
-    created_at: datetime
+# Define JWT settings
+class Settings(BaseModel):
+    authjwt_secret_key: str = os.getenv("SECRET_KEY")
 
 app = FastAPI(
     title="Book Review API",
@@ -30,8 +28,32 @@ client = AsyncIOMotorClient(MONGODB_URI)
 db = client["SOA"]
 clan = db["reviews"]
 
+class Review(BaseModel):
+    book_id: int
+    user_id: int
+    rating: int
+    comment: str
+    created_at: datetime
+
+def get_current_user(Authorize: AuthJWT = Depends()):
+    try:
+        # This will validate the token from the request headers
+        Authorize.jwt_required()
+
+        # Get the current user's information from the JWT
+        current_user = Authorize.get_jwt_subject()
+        return current_user
+    except Exception as e:
+        raise HTTPException(status_code=401, detail="Invalid or missing token")
+
+# Add middleware for JWT
+app.add_middleware(
+    BaseHTTPMiddleware,
+    dispatch=lambda request, call_next: call_next(request),
+)
+
 @app.get("/", tags=["Root"])
-async def read_root():
+async def read_root(current_user: str = Depends(get_current_user)):
     """
     Returns a welcome message.
     - **Path**: `/`
@@ -40,21 +62,18 @@ async def read_root():
     return {"message": "Welcome to REVIEWS!"}
 
 @app.get("/reviews/{review_id}", tags=["Reviews"])
-async def get_review(review_id: str):
+async def get_review(review_id: str, current_user: str = Depends(get_current_user)):
     """
     Get a review by its ID.
-    - **Path**: `/reviews/{review_id}`
-    - **Parameters**: review_id (str)
-    - **Returns**: Review details including book_id, user_id, rating, comment, and created_at.
-    - **Responses**:
-        - 200: Successfully retrieved the review.
-        - 404: Review not found.
-        - 500: Internal server error.
     """
     try:
         review = await clan.find_one({"_id": ObjectId(review_id)})
         if review is None:
             raise HTTPException(status_code=404, detail="Review not found")
+
+        if review["user_id"] != current_user:
+            raise HTTPException(status_code=403, detail="You are not authorized to access this review")
+
         review_dict = {**review}
         review_dict["id"] = str(review_dict["_id"])
         del review_dict["_id"]
@@ -63,14 +82,9 @@ async def get_review(review_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.get("/reviews", tags=["Reviews"])
-async def get_reviews():
+async def get_reviews(current_user: str = Depends(get_current_user)):
     """
     Get all reviews.
-    - **Path**: `/reviews`
-    - **Returns**: A list of all reviews.
-    - **Responses**:
-        - 200: Successfully retrieved the list of reviews.
-        - 500: Internal server error.
     """
     try:
         reviews_cursor = clan.find()
@@ -86,16 +100,9 @@ async def get_reviews():
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.post("/reviews", tags=["Reviews"])
-async def create_review(review: Review):
+async def create_review(review: Review, current_user: str = Depends(get_current_user)):
     """
     Create a new review.
-    - **Path**: `/reviews`
-    - **Parameters**: Review object containing book_id, user_id, rating, comment.
-    - **Returns**: The ID of the created review.
-    - **Responses**:
-        - 201: Successfully created the review.
-        - 400: Bad request (e.g., invalid input).
-        - 500: Internal server error.
     """
     try:
         review_dict = review.dict()
@@ -104,20 +111,11 @@ async def create_review(review: Review):
         return {"id": str(result.inserted_id)}
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
-    
-    
 
 @app.put("/reviews/{review_id}", tags=["Reviews"])
-async def update_review(review_id: str, review: Review):
+async def update_review(review_id: str, review: Review, current_user: str = Depends(get_current_user)):
     """
     Update an existing review.
-    - **Path**: `/reviews/{review_id}`
-    - **Parameters**: review_id (str), Review object containing book_id, user_id, rating, comment.
-    - **Returns**: A message indicating success or failure.
-    - **Responses**:
-        - 200: Successfully updated the review.
-        - 404: Review not found.
-        - 500: Internal server error.
     """
     try:
         review_dict = review.dict()
@@ -130,16 +128,9 @@ async def update_review(review_id: str, review: Review):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/reviews/{review_id}", tags=["Reviews"])
-async def delete_review(review_id: str):
+async def delete_review(review_id: str, current_user: str = Depends(get_current_user)):
     """
     Delete a review by its ID.
-    - **Path**: `/reviews/{review_id}`
-    - **Parameters**: review_id (str)
-    - **Returns**: A message indicating success or failure.
-    - **Responses**:
-        - 200: Successfully deleted the review.
-        - 404: Review not found.
-        - 500: Internal server error.
     """
     try:
         result = await clan.delete_one({"_id": ObjectId(review_id)})
@@ -150,16 +141,9 @@ async def delete_review(review_id: str):
         raise HTTPException(status_code=500, detail=str(e))
 
 @app.delete("/reviews/user/{user_id}", tags=["Reviews"])
-async def delete_reviews_by_user(user_id: int):
+async def delete_reviews_by_user(user_id: int, current_user: str = Depends(get_current_user)):
     """
     Delete all reviews by a user.
-    - **Path**: `/reviews/user/{user_id}`
-    - **Parameters**: user_id (int)
-    - **Returns**: A message indicating the number of reviews deleted.
-    - **Responses**:
-        - 200: Successfully deleted reviews for the user.
-        - 404: No reviews found for the specified user.
-        - 500: Internal server error.
     """
     try:
         result = await clan.delete_many({"user_id": user_id})
@@ -170,16 +154,9 @@ async def delete_reviews_by_user(user_id: int):
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 @app.get("/reviews/book/{book_id}", tags=["Reviews"])
-async def get_reviews_by_book(book_id: int):
+async def get_reviews_by_book(book_id: int, current_user: str = Depends(get_current_user)):
     """
     Get all reviews for a specific book.
-    - **Path**: `/reviews/book/{book_id}`
-    - **Parameters**: book_id (int)
-    - **Returns**: A list of reviews for the specified book.
-    - **Responses**:
-        - 200: Successfully retrieved reviews for the book.
-        - 404: No reviews found for the specified book.
-        - 500: Internal server error.
     """
     try:
         reviews_cursor = clan.find({"book_id": book_id})
@@ -197,15 +174,9 @@ async def get_reviews_by_book(book_id: int):
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 @app.post("/reviews/bulk", tags=["Reviews"])
-async def create_bulk_reviews(reviews: list[Review]):
+async def create_bulk_reviews(reviews: list[Review], current_user: str = Depends(get_current_user)):
     """
     Create multiple reviews at once.
-    - **Path**: `/reviews/bulk`
-    - **Parameters**: A list of Review objects.
-    - **Returns**: The IDs of the created reviews.
-    - **Responses**:
-        - 201: Successfully created the reviews.
-        - 500: Internal server error.
     """
     try:
         reviews_dict = [review.dict() for review in reviews]
@@ -217,17 +188,9 @@ async def create_bulk_reviews(reviews: list[Review]):
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 @app.put("/reviews/{review_id}/rating", tags=["Reviews"])
-async def update_review_rating(review_id: str, rating: int):
+async def update_review_rating(review_id: str, rating: int, current_user: str = Depends(get_current_user)):
     """
     Update the rating of an existing review.
-    - **Path**: `/reviews/{review_id}/rating`
-    - **Parameters**: review_id (str), rating (int)
-    - **Returns**: A message indicating success or failure.
-    - **Responses**:
-        - 200: Successfully updated the rating.
-        - 400: Invalid rating.
-        - 404: Review not found.
-        - 500: Internal server error.
     """
     try:
         if rating < 1 or rating > 5:
@@ -240,16 +203,9 @@ async def update_review_rating(review_id: str, rating: int):
         raise HTTPException(status_code=500, detail=f"Internal Server Error: {str(e)}")
 
 @app.get("/reviews/user/{user_id}", tags=["Reviews"])
-async def get_reviews_by_user(user_id: int):
+async def get_reviews_by_user(user_id: int, current_user: str = Depends(get_current_user)):
     """
     Get all reviews by a specific user.
-    - **Path**: `/reviews/user/{user_id}`
-    - **Parameters**: user_id (int)
-    - **Returns**: A list of reviews made by the specified user.
-    - **Responses**:
-        - 200: Successfully retrieved reviews for the user.
-        - 404: No reviews found for the specified user.
-        - 500: Internal server error.
     """
     try:
         reviews_cursor = clan.find({"user_id": user_id})

@@ -2,6 +2,16 @@
     import { loginState } from '$lib/state.svelte.js';
     let { data } = $props();
 
+    let users = $state(data.users)
+
+    
+    let newUser = $state({
+        name: '',
+        email: '',
+        password: ''
+    });
+
+
     let loading = true;
     let error = null;
 
@@ -9,12 +19,54 @@
         window.location.href = '/';
     } 
 
-    const deleteUser = (userId) => {
-        alert(`User with ID ${userId} deleted.`);
+    const deleteUser = async (userId) => {
+        try {
+            const response = await fetch(`http://localhost:4001/api/users/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${loginState.jwtToken}`,
+                    'Content-Type': 'application/json',
+                },
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to delete user.');
+            }
+
+            users = users.filter((user) => user.id !== userId);
+        } catch (err) {
+            alert(`Error deleting user: ${err.message}`);
+        }
     };
 
-    const addUser = () => {
-        alert('Add user functionality goes here');
+    const addUser = async () => {
+        try {
+            const response = await fetch('http://localhost:4001/api/users', {
+                method: 'POST',
+                headers: {
+                    Authorization: `Bearer ${loginState.jwtToken}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(newUser),
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to add user.');
+            }
+
+            const createdUser = await response.json();
+          
+            users = [...data.users, createdUser];
+
+            newUser = {
+                name: '',
+                email: '',
+                password: ''
+            };
+
+        } catch (err) {
+            alert(`Error adding user: ${err.message}`);
+        }
     };
 
     
@@ -22,15 +74,41 @@
 
 {#if loginState.jwtToken}
  <div class="flex flex-col gap-4 items-center p-6">
-    <button 
-        onclick={addUser} 
-        class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300 mb-4"
+
+    <form 
+        onsubmit={addUser} 
+        class="flex flex-col gap-4 p-4 border rounded-lg shadow-md w-full max-w-md bg-gray-100"
     >
-        Dodaj uporabnika!
-    </button>
+        <h2 class="text-lg font-semibold">Dodaj novega uporabnika</h2>
+        <input 
+            type="text" 
+            placeholder="Ime" 
+            bind:value={newUser.name} 
+            class="p-2 border rounded-lg"
+            required 
+        />
+        <input 
+            type="email" 
+            placeholder="E-pošta" 
+            bind:value={newUser.email} 
+            class="p-2 border rounded-lg"
+        />
+        <input 
+            type="text" 
+            placeholder="Geslo" 
+            bind:value={newUser.password} 
+            class="p-2 border rounded-lg"
+        />
+        <button 
+            type="submit" 
+            class="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition duration-300"
+        >
+            Dodaj uporabnika
+        </button>
+    </form>
 
     <div class="flex flex-row gap-6 justify-center flex-wrap">
-        {#each data.users as user}
+        {#each users as user}
             <div class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
                 <h2 class="font-bold text-xl mb-2">{user.name}</h2>
                 <p class="text-gray-700 text-sm">Email: {user.email ? user.email : 'Neznano'}</p>

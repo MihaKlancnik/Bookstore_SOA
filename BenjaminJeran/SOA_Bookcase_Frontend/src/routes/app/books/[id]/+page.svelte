@@ -1,8 +1,16 @@
 
 <script>
     let { data } = $props();
-    let book = data.props.book.book;
-    let reviews = data.props.book.reviews;
+
+    //let book = data.props.book.book;
+
+    let book = data.props.book;
+    let reviews = [];
+    //let reviews = data.props.book.reviews;
+
+    let inventory = 0; 
+
+
 
     console.log(reviews)
 
@@ -26,12 +34,22 @@
 
         <p class="text-gray-600 text-base mb-4">{book.description}</p>
         
-        <div class="flex justify-between items-center mt-4">
+        {#if inventory > 0}
+            <div class="flex justify-between items-center mt-4">
+                <span class="text-gray-900 font-semibold text-lg">${book.price}</span>
+                <button class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
+                    Dodaj v košarico
+                </button>
+            </div>
+        {:else}
+            <div class="flex justify-between items-center mt-4">
             <span class="text-gray-900 font-semibold text-lg">${book.price}</span>
-            <button class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
-                Dodaj v košarico
+            <button class="px-4 py-2 bg-gray-500 text-white rounded-full cursor-not-allowed">
+                Ni na zalogi
             </button>
-        </div>
+             </div>
+        {/if}
+
     </div>
 
     {#if reviews.length === 0}

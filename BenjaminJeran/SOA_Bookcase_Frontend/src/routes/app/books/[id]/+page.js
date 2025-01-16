@@ -1,5 +1,7 @@
 import { error } from '@sveltejs/kit';
-import { loginState } from '$lib/state.svelte.js';
+
+let book = []
+let reviews = []
 
 export async function load({ params }) {
  
@@ -11,28 +13,29 @@ export async function load({ params }) {
     };
 
     let jwtToken = localStorage.getItem('jwt_token');
+
     if (jwtToken) {
         console.log('Token:', jwtToken);
         headers['authorization'] = `Bearer ${jwtToken}`; 
     }
 
     try {
-       /*  const response = await fetch(`http://localhost:3000/api/books/${id}/reviews`, { headers });
-
-        if (!response.ok) {
+        
+        const response_book = await fetch(`http://localhost:3000/api/books/${id}`, { headers });
+        if (!response_book.ok) {
             throw new error(`Failed to fetch book with ID: ${id}`);
         }
 
-        const book = await response.json(); */
+        book = await response_book.json(); 
 
-        const response = await fetch(`http://localhost:3000/api/books/${id}`, { headers });
-        if (!response.ok) {
-            throw new error(`Failed to fetch book with ID: ${id}`);
+        const response_reviews = await fetch(`http://localhost:3000/api/books/${id}/reviews`, { headers });
+        if (!response_reviews.ok) {
+            console.log(`Failed to fetch book with ID: ${id}`);
         }
 
-        const book = await response.json(); 
+        const reviews = await response_reviews.json(); 
 
-        return { props: { book } };
+        return { props: { book, reviews } };
     } catch (err) {
         throw error(404, `Book with ID ${id} not found.`);
     }

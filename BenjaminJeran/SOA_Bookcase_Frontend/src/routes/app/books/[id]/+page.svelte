@@ -6,13 +6,10 @@
 
     let book = data.props.book;
     let reviews = [];
+    
     //let reviews = data.props.book.reviews;
 
-    let inventory = 0; 
-
-
-
-    console.log(reviews)
+    let inventory = $state(data.props.inventory.inventory);
 
 
     const NarisiZvezdice = (rating) => {
@@ -33,6 +30,8 @@
         <p class="text-gray-700 text-sm mb-2">Avtor: {book.author}</p>
 
         <p class="text-gray-600 text-base mb-4">{book.description}</p>
+
+        <p class="text-gray-600 text-base mb-4">{inventory === undefined ? 'Artikel ni na voljo' : `Zaloga: ${inventory}`}</p>
         
         {#if inventory > 0}
             <div class="flex justify-between items-center mt-4">

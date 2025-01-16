@@ -26,6 +26,9 @@
 
         const decodedPayload = JSON.parse(atob(token.split('.')[1]));
 
+        console.log(decodedPayload);
+        
+        UserState.sub = decodedPayload.sub;
         UserState.name = decodedPayload.name;
         UserState.role = decodedPayload.role
 

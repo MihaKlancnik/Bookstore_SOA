@@ -6,7 +6,6 @@ from datetime import datetime
 import uvicorn
 import os
 from dotenv import load_dotenv
-from fastapi_jwt_auth import AuthJWT
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse
 

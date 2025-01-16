@@ -5,7 +5,7 @@ from typing import List
 import httpx
 import os
 from dotenv import load_dotenv
-from fastapi_jwt_auth import AuthJWT
+#from fastapi_jwt_auth import AuthJWT
 from starlette.middleware.base import BaseHTTPMiddleware
 load_dotenv()
 

@@ -35,10 +35,10 @@ export async function load() {
                 throw error(500, 'Failed to load user data');
             }
 
-            const user = await response.json();
-            console.log(user);
+            const users = await response.json();
+            //console.log(users);
 
-            return { user };
+            return { users };
         }
 
         throw error(403, 'Forbidden');

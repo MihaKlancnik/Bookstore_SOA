@@ -36,6 +36,8 @@ export async function load({ params }) {
 
         const reviews = await response_reviews.json(); 
 
+        console.log(reviews)
+
 
         const response_inventory = await fetch(`http://localhost:3000/api/books/${id}/inventory`, { headers });
         if (!response_inventory.ok) {

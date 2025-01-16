@@ -294,7 +294,13 @@ router.delete('/:id', (req, res) => {
  *         description: Internal server error
  */
 router.get('/:id/reviews', async (req, res) => {
+    
     const bookId = req.params.id;
+    const token = req.headers['authorization']?.split(' ')[1]; 
+
+    if (!token) {
+        return res.status(403).json({ error: 'Authorization token is required for inventory request.' });
+    }
 
     try {
         // Verify the book exists in the database
@@ -310,7 +316,12 @@ router.get('/:id/reviews', async (req, res) => {
             }
 
             try {
-                const reviewsResponse = await axios.get(`http://reviewservice:2000/reviews/book/${bookId}`);
+                const reviewsResponse = await axios.get(`http://reviewservice:2000/reviews/book/${bookId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                    }
+                });
+
                 const reviews = reviewsResponse.data;
 
                 res.json({ book, reviews });
@@ -367,7 +378,7 @@ router.get('/:id/reviews', async (req, res) => {
  */
 router.get('/:id/inventory', async (req, res) => {
     const bookId = req.params.id;
-    const token = req.headers['authorization']?.split(' ')[1]; // Get the token from the request headers
+    const token = req.headers['authorization']?.split(' ')[1]; 
 
     if (!token) {
         return res.status(403).json({ error: 'Authorization token is required for inventory request.' });

@@ -4,6 +4,7 @@
    import { UserState } from '$lib/state.svelte.js';
    async function handleSubmit() {
    const { email, password } = loginState;
+   
 
   try {
     const res = await fetch('http://localhost:4001/api/users/login', {

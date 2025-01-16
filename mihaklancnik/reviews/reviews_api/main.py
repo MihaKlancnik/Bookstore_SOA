@@ -1,14 +1,14 @@
-from bson import ObjectId
 from motor.motor_asyncio import AsyncIOMotorClient
 from fastapi import FastAPI, HTTPException, Request, Depends
 from pydantic import BaseModel
 from datetime import datetime
-import uvicorn
 import os
 from dotenv import load_dotenv
 from fastapi_jwt_auth import AuthJWT
 from starlette.middleware.base import BaseHTTPMiddleware
 #from starlette.responses import JSONResponse
+#from pymongo import SON
+from bson.objectid import ObjectId
 
 load_dotenv()
 

@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 from fastapi_jwt_auth import AuthJWT
 from starlette.middleware.base import BaseHTTPMiddleware
+
 load_dotenv()
 
 geslo = os.environ.get("MihaGeslo")
@@ -27,10 +28,10 @@ app.config = Settings()
 
 def get_current_user(Authorize: AuthJWT = Depends()):
     try:
-        # This will validate the token from the request headers
+        
         Authorize.jwt_required()
 
-        # Get the current user's information from the JWT
+        
         current_user = Authorize.get_jwt_subject()
         return current_user
     except Exception as e:
@@ -45,8 +46,8 @@ app.add_middleware(
 class Order(BaseModel):
     order_id: int
     book_id: str
-    quantity: int = Field(..., gt=0, description="Quantity must be greater than 0")
-    price: float = Field(..., gt=0, description="Price must be greater than 0")
+    quantity: int 
+    price: float 
 
     class Config:
         schema_extra = {
@@ -58,8 +59,7 @@ class Order(BaseModel):
                 }
         }
 
-# CREATE operation (Insert a new order)
-# CREATE operation (Insert a new order)
+
 @app.post("/orders/", response_model=Order, status_code=status.HTTP_201_CREATED,
           summary="Create a new order", tags=["Orders"],
           responses={201: {"description": "Order created", "model": Order},
@@ -69,7 +69,7 @@ async def create_order(order: Order, current_user: str = Depends(get_current_use
     Create a new order in the system. 
     """
     order_dict = order.dict()
-    order_dict["user_id"] = current_user  # Store the current user ID in the order
+    order_dict["user_id"] = current_user  
     result = await order_collection.insert_one(order_dict)
     order_dict["_id"] = str(result.inserted_id)
     return order_dict
@@ -163,7 +163,7 @@ async def get_orders_by_quantity(min_quantity: int):
 
 
 
-@app.post("/orders/", response_model=Order, status_code=status.HTTP_201_CREATED,
+@app.post("/orders-update", response_model=Order, status_code=status.HTTP_201_CREATED,
           summary="Create a new order and update inventory", tags=["Orders"],
           responses={201: {"description": "Order created", "model": Order},
                      400: {"description": "Bad Request"},

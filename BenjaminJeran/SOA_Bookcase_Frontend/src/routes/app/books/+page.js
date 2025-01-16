@@ -1,7 +1,4 @@
-import { loginState } from '$lib/state.svelte.js';
 import { error } from '@sveltejs/kit';
-
-
 
 async function logVisit(page) {
     try {
@@ -25,12 +22,10 @@ async function logVisit(page) {
 
 
   export async function load() {
-
-    const headers = {
+      const headers = {
         'Content-Type': 'application/json',
     };
 
-    // Check if running in the browser and access localStorage
     if (typeof window !== 'undefined') {
         const jwtToken = localStorage.getItem('jwt_token');
         console.log('Token:', jwtToken);
@@ -39,29 +34,26 @@ async function logVisit(page) {
             console.log('Token:', jwtToken);
             headers['authorization'] = `Bearer ${jwtToken}`; 
         }
+
+        try {
+          const response = await fetch('http://localhost:3000/api/books', { headers });
+  
+          if (!response.ok) {
+              throw new Error('Failed to load books data');
+          }
+  
+          const books = await response.json();
+  
+          logVisit('books');
+  
+          return {
+              books,
+          };
+  
+      } catch (err) {
+          console.error('Error:', err);
+          throw error(500, 'Error fetching books data');
+      }
     }
-
-    try {
-        // Fetch the books data
-        const response = await fetch('http://localhost:3000/api/books', { headers });
-
-        // Check if the response is ok
-        if (!response.ok) {
-            throw new Error('Failed to load books data');
-        }
-
-        const books = await response.json();
-
-        // Log the visit
-        logVisit('books');
-
-        // Return the books data
-        return {
-            books,
-        };
-    } catch (err) {
-        // Handle any errors that might occur
-        console.error('Error:', err);
-        throw error(500, 'Error fetching books data');
-    }
-}
+  }
+   

@@ -1,4 +1,5 @@
 const inventoryModel = require('../models/inventoryModel');
+const axios = require('axios');
 
 exports.getAllInventory = async (req, res) => {
     try {

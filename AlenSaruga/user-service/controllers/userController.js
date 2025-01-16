@@ -1,5 +1,7 @@
 const userModel = require('../models/userModel');
 const jwt = require('jsonwebtoken');
+const axios = require('axios');
+
 
 const SECRET_KEY = process.env.SECRET_KEY;
 
@@ -68,21 +70,15 @@ exports.getUserById = async (req, res) => {
         } else if (!user) {
             res.status(404).json({ error: 'User not found' });
         } else {
-
             try {
                 const getReviewsResponse = await axios.get('http://localhost:3000/reviews/user/' + user.id);
 
-                if (getbookResponse.status !== 200) {
-                    return res.status(400).json({ error: 'Book not found' });
-                }
-
-                const reviews = getReviewsResponse.data;
-
-                user.reviews = reviews;
-            }
-            catch (err) {
-                console.error('Error during login:', err.message);
-                return res.status(500).json({ error: 'Internal server error' });
+                user.reviews = (getReviewsResponse.status === 200 && Array.isArray(getReviewsResponse.data))
+                    ? getReviewsResponse.data
+                    : [];
+            } catch (err) {
+                console.error('Error fetching reviews:', err.message);
+                user.reviews = [];
             }
             res.json(user);
         }

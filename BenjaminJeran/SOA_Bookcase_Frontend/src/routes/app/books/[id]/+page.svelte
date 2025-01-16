@@ -2,14 +2,16 @@
 <script>
     let { data } = $props();
 
-    //let book = data.props.book.book;
-
     let book = data.props.book;
     let reviews = [];
     
     //let reviews = data.props.book.reviews;
 
     let inventory = $state(data.props.inventory.inventory);
+
+    const decodedPayload = JSON.parse(atob(localStorage.getItem('jwt_token').split('.')[1]));
+
+    let userID = decodedPayload.sub;
 
 
     const NarisiZvezdice = (rating) => {
@@ -18,6 +20,46 @@
             zvezdice.push('✨');
         }
         return zvezdice.join('');
+    }
+
+
+    let rating = $state(0) ;
+    let comment = $state("");
+
+    async function submitReview() {
+        const reviewData = {
+            book_id: book.id,
+            user_id: userID,
+            rating: rating,
+            comment: comment
+        };
+
+        try {
+            const response = await fetch("http://localhost:2000/reviews", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("jwt_token")}`, 
+                },
+                body: JSON.stringify(reviewData),
+            });
+
+            if (response.ok) {
+                const newReview = await response.json();
+                reviews.push({
+                    id: newReview.id,
+                    rating: rating,
+                    comment: comment
+                });
+                comment = "";  // Clear the comment field after submission
+                rating = 0;    // Reset the rating
+            } else {
+                const error = await response.json();
+                alert(error.detail || "Error while submitting the review");
+            }
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
     }
 
 </script>
@@ -48,7 +90,34 @@
             </button>
              </div>
         {/if}
+    </div>
 
+    <div class="max-w-4xl mx-auto p-6 mt-8 bg-white rounded-lg shadow-lg">
+        <h2 class="text-2xl font-semibold mb-4">Dodaj Mnenje</h2>
+        
+        <div class="mb-4">
+            <label for="rating" class="block text-gray-700">Ocena:</label>
+            <select id="rating" class="block w-full mt-2 p-2 border border-gray-300 rounded" bind:value={rating}>
+                <option value="0">Izberi oceno</option>
+                <option value="1">1 ✨</option>
+                <option value="2">2 ✨✨</option>
+                <option value="3">3 ✨✨✨</option>
+                <option value="4">4 ✨✨✨✨</option>
+                <option value="5">5 ✨✨✨✨✨</option>
+            </select>
+        </div>
+        
+        <div class="mb-4">
+            <label for="comment" class="block text-gray-700">Komentar:</label>
+            <textarea id="comment" class="block w-full mt-2 p-2 border border-gray-300 rounded" rows="4" bind:value={comment}></textarea>
+        </div>
+        
+        <button 
+            type="button" 
+            class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition" 
+            onclick={submitReview}>
+            Oddaj Mnenje
+        </button>
     </div>
 
     {#if reviews.length === 0}

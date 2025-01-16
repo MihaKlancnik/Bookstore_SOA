@@ -4,8 +4,8 @@
     let books = data.books;
 </script>
 
-<h1 class=" mt-10 text-4xl font-bold text-center">Knjige</h1>
-<div class=" mt-10 flex flex-row flex-wrap justify-start gap-8 px-4">
+<h1 class="mt-10 text-4xl font-bold text-center">Knjige</h1>
+<div class="mt-10 flex flex-row flex-wrap justify-center gap-8 px-4 mb-6">
     {#each books as book}
         <a href={`/app/books/${book.id}`} class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
             <h2 class="font-bold text-xl mb-2">{book.title}</h2>

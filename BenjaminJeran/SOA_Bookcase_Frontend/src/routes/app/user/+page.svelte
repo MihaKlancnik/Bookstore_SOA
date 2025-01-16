@@ -1,7 +1,11 @@
 <script>
 	import { goto } from '$app/navigation';
+	import { UserState } from '$lib/state.svelte.js';
 
     let { data } = $props();
+
+    console.log(data.users);
+
     let users = $state(data.users)
 
     let newUser = $state({
@@ -12,7 +16,6 @@
 
     let loading = true;
     let error = null;
-
 
     let jwtToken = localStorage.getItem('jwt_token');
    
@@ -75,58 +78,69 @@
 
 {#if jwtToken}
  <div class="flex flex-col gap-4 items-center p-6">
-
-    <form 
-        onsubmit={addUser} 
-        class="flex flex-col gap-4 max-w-xl rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 "
-    >
-        <h2 class="text-lg font-semibold">Dodaj novega uporabnika</h2>
-        <input 
-            type="text" 
-            placeholder="Ime" 
-            bind:value={newUser.name} 
-            class="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-            required 
-        />
-        <input 
-            type="email" 
-            placeholder="E-pošta" 
-            bind:value={newUser.email} 
-            class="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-        />
-        <input 
-            type="text" 
-            placeholder="Geslo" 
-            bind:value={newUser.password} 
-            class="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-        />
-        <button 
-            type="submit" 
-            class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+    {#if UserState.role === "admin"}
+        <form 
+            onsubmit={addUser} 
+            class="flex flex-col gap-4 max-w-xl rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 "
         >
-            Dodaj uporabnika
-        </button>
-    </form>
-
-    <div class="flex flex-row gap-6 justify-center flex-wrap">
-        {#each users as user}
-            <div class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
-                <h2 class="font-bold text-xl mb-2">{user.name}</h2>
-                <p class="text-gray-700 text-sm">Email: {user.email ? user.email : 'Neznano'}</p>
-                <p class="text-gray-700 text-sm mt-2">Phone: {user.phone ? user.phone : 'Neznano'}</p>
-                <p class="text-gray-700 text-sm mt-2">Address: {user.address ? user.address : 'Neznano'}</p>
-                <div class="mt-4">
-                    <span class="text-gray-600 text-sm">Joined: {new Date(user.created_at).toLocaleDateString()}</span>
+            <h2 class="text-lg font-semibold">Dodaj novega uporabnika</h2>
+            <input 
+                type="text" 
+                placeholder="Ime" 
+                bind:value={newUser.name} 
+                class="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+                required 
+            />
+            <input 
+                type="email" 
+                placeholder="E-pošta" 
+                bind:value={newUser.email} 
+                class="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            />
+            <input 
+                type="text" 
+                placeholder="Geslo" 
+                bind:value={newUser.password} 
+                class="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
+            />
+            <button 
+                type="submit" 
+                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
+            >
+                Dodaj uporabnika
+            </button>
+        </form>
+        <div class="flex flex-row gap-6 justify-center flex-wrap">
+            {#each users as user}
+                <div class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
+                    <h2 class="font-bold text-xl mb-2">{user.name}</h2>
+                    <p class="text-gray-700 text-sm">Email: {user.email ? user.email : 'Neznano'}</p>
+                    <p class="text-gray-700 text-sm mt-2">Phone: {user.phone ? user.phone : 'Neznano'}</p>
+                    <p class="text-gray-700 text-sm mt-2">Address: {user.address ? user.address : 'Neznano'}</p>
+                    <div class="mt-4">
+                        <span class="text-gray-600 text-sm">Joined: {new Date(user.created_at).toLocaleDateString()}</span>
+                    </div>
+    
+                    <button 
+                        onclick={() => deleteUser(user.id)} 
+                        class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
+                    >
+                        Izbriši
+                    </button>
                 </div>
-
-                <button 
-                    onclick={() => deleteUser(user.id)} 
-                    class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
-                >
-                    Izbriši
-                </button>
-            </div>
-        {/each}
+            {/each}
+        </div>
+    {/if}
+    <h1 class="font-bold text-6xl">Vaš račun</h1>
+    <div class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
+        <h2 class="font-bold text-xl mb-2">{users.name}</h2>
+        <p class="text-gray-700 text-sm">Email: {users.email ? users.email : 'Neznano'}</p>
+        <p class="text-gray-700 text-sm mt-2">Phone: {users.phone ? users.phone : 'Neznano'}</p>
+        <p class="text-gray-700 text-sm mt-2">Address: {users.address ? users.address : 'Neznano'}</p>
+        <div class="mt-4">
+            <span class="text-gray-600 text-sm">Joined: {new Date(users.created_at).toLocaleDateString()}</span>
+        </div>
     </div>
+    
 </div>   
 {/if}

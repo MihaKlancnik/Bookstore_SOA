@@ -11,6 +11,7 @@ export const loginState = $state({
   });
 
   export const UserState = $state({
+    sub: '',
     name: '',
     role: 'user'
   });

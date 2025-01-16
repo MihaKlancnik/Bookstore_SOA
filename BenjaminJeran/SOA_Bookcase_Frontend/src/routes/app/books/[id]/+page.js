@@ -27,6 +27,7 @@ export async function load({ params }) {
         }
 
         book = await response_book.json(); 
+        console.log(book)
 
         const response_reviews = await fetch(`http://localhost:3000/api/books/${id}/reviews`, { headers });
         if (!response_reviews.ok) {
@@ -35,7 +36,18 @@ export async function load({ params }) {
 
         const reviews = await response_reviews.json(); 
 
-        return { props: { book, reviews } };
+        console.log(reviews)
+
+
+        const response_inventory = await fetch(`http://localhost:3000/api/books/${id}/inventory`, { headers });
+        if (!response_inventory.ok) {
+            console.log(`Failed to fetch book with ID: ${id}`);
+        }
+
+        const inventory = await response_inventory.json(); 
+
+
+        return { props: { book, reviews, inventory} };
     } catch (err) {
         throw error(404, `Book with ID ${id} not found.`);
     }

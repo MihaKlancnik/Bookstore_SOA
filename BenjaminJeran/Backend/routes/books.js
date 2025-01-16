@@ -294,7 +294,13 @@ router.delete('/:id', (req, res) => {
  *         description: Internal server error
  */
 router.get('/:id/reviews', async (req, res) => {
+    
     const bookId = req.params.id;
+    const token = req.headers['authorization']?.split(' ')[1]; 
+
+    if (!token) {
+        return res.status(403).json({ error: 'Authorization token is required for inventory request.' });
+    }
 
     try {
         // Verify the book exists in the database
@@ -310,7 +316,12 @@ router.get('/:id/reviews', async (req, res) => {
             }
 
             try {
-                const reviewsResponse = await axios.get(`http://reviewservice:2000/reviews/book/${bookId}`);
+                const reviewsResponse = await axios.get(`http://reviewservice:2000/reviews/book/${bookId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`, 
+                    }
+                });
+
                 const reviews = reviewsResponse.data;
 
                 res.json({ book, reviews });
@@ -367,6 +378,11 @@ router.get('/:id/reviews', async (req, res) => {
  */
 router.get('/:id/inventory', async (req, res) => {
     const bookId = req.params.id;
+    const token = req.headers['authorization']?.split(' ')[1]; 
+
+    if (!token) {
+        return res.status(403).json({ error: 'Authorization token is required for inventory request.' });
+    }
 
     try {
         // Verify the book exists in the database
@@ -382,8 +398,13 @@ router.get('/:id/inventory', async (req, res) => {
             }
 
             try {
-                // Fetch inventory size from the Inventory microservice
-                const inventoryResponse = await axios.get(`http://inventoryservice:4002/api/inventory/${bookId}`);
+                // Send the token in the Authorization header for the inventory service request
+                const inventoryResponse = await axios.get(`http://inventoryservice:4002/api/inventory/${bookId}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`,  // Sending JWT token in the request header
+                    }
+                });
+
                 const inventory = inventoryResponse.data;
 
                 // Respond with inventory quantity
@@ -391,6 +412,7 @@ router.get('/:id/inventory', async (req, res) => {
                     book_id: bookId,
                     inventory: inventory.quantity || 0, // Use the `quantity` field from the inventory response
                 });
+                
             } catch (error) {
                 if (error.response && error.response.status === 404) {
                     res.status(404).json({ error: `No inventory data found for book with ID ${bookId}` });

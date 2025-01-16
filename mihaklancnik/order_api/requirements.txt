@@ -1,6 +1,7 @@
 fastapi
-uvicorn
-python-dotenv
+pydantic
 motor
 httpx
-pydantic
+python-dotenv
+fastapi-jwt-auth
+starlette

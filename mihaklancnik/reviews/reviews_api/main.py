@@ -9,18 +9,22 @@ from starlette.middleware.base import BaseHTTPMiddleware
 #from starlette.responses import JSONResponse
 #from pymongo import SON
 from bson.objectid import ObjectId
+import jwt
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from typing import Optional
 
 load_dotenv()
 
-# Define JWT settings
-class Settings(BaseModel):
-    authjwt_secret_key: str = os.getenv("SECRET_KEY")
+SECRET_KEY = os.getenv("SECRET_KEY")
+security = HTTPBearer()
 
+# Define JWT settings
 app = FastAPI(
     title="Book Review API",
     description="API for managing book reviews, supporting operations like GET, POST, PUT, and DELETE.",
     version="1.0.0"
 )
+#app.config.from_object(Settings)
 
 # MongoDB connection
 MONGODB_URI = "mongodb+srv://moji_prijatelji:knjigarna@ptscluster.qfts7.mongodb.net/?retryWrites=true&w=majority&appName=PTSCLUSTER"  
@@ -35,22 +39,47 @@ class Review(BaseModel):
     comment: str
     created_at: datetime
 
-def get_current_user(Authorize: AuthJWT = Depends()):
+async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)) -> str:
     try:
-        # This will validate the token from the request headers
-        Authorize.jwt_required()
-
-        # Get the current user's information from the JWT
-        current_user = Authorize.get_jwt_subject()
-        return current_user
+        token = credentials.credentials
+        payload = jwt.decode(
+            token, 
+            SECRET_KEY, 
+            algorithms=["HS256"],
+            issuer="https://soa.abm.com"
+        )
+        
+        # Get user ID from the 'sub' claim
+        user_id = str(payload.get("sub"))
+        if not user_id:
+            raise HTTPException(
+                status_code=401,
+                detail="Invalid token payload"
+            )
+        return user_id
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=401,
+            detail="Token has expired"
+        )
+    except jwt.InvalidIssuerError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token issuer"
+        )
+    except jwt.InvalidTokenError:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid token"
+        )
     except Exception as e:
-        raise HTTPException(status_code=401, detail="Invalid or missing token")
+        raise HTTPException(
+            status_code=401,
+            detail=f"Could not validate credentials: {str(e)}"
+        )
 
 # Add middleware for JWT
-app.add_middleware(
-    BaseHTTPMiddleware,
-    dispatch=lambda request, call_next: call_next(request),
-)
+#app.add_middleware(JWTMiddleware)
 
 @app.get("/", tags=["Root"])
 async def read_root(current_user: str = Depends(get_current_user)):

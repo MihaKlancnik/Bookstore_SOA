@@ -10,19 +10,27 @@ export async function load({ params }) {
         'Content-Type': 'application/json',
     };
 
-    if (loginState.jwtToken) {
-        console.log('Token:', loginState.jwtToken);
-        headers['authorization'] = `Bearer ${loginState.jwtToken}`; 
+    let jwtToken = localStorage.getItem('jwt_token');
+    if (jwtToken) {
+        console.log('Token:', jwtToken);
+        headers['authorization'] = `Bearer ${jwtToken}`; 
     }
 
     try {
-        const response = await fetch(`http://localhost:3000/api/books/${id}/reviews`, { headers });
+       /*  const response = await fetch(`http://localhost:3000/api/books/${id}/reviews`, { headers });
 
         if (!response.ok) {
             throw new error(`Failed to fetch book with ID: ${id}`);
         }
 
-        const book = await response.json();
+        const book = await response.json(); */
+
+        const response = await fetch(`http://localhost:3000/api/books/${id}`, { headers });
+        if (!response.ok) {
+            throw new error(`Failed to fetch book with ID: ${id}`);
+        }
+
+        const book = await response.json(); 
 
         return { props: { book } };
     } catch (err) {

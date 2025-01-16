@@ -5,3 +5,4 @@ httpx
 python-dotenv
 fastapi-jwt-auth
 starlette
+uvicorn

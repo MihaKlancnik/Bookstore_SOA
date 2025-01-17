@@ -1,37 +1,32 @@
 <script>
   import { onMount } from "svelte";
-  import { Chart } from "chart.js/auto"; // Import Chart.js
+  import { Chart } from "chart.js/auto";
 
-  let stats = { totalVisits: 0, pageVisits: {} }; // Initial value
+  let stats = { totalVisits: 0, pageVisits: {} };
 
-  // Chart.js ref for the chart
   let chart;
 
-  // Fetch statistics when the component mounts
   onMount(async () => {
     try {
       const response = await fetch("http://localhost:5000/stats");
       stats = await response.json();
-
-      // Initialize the chart with initial data
       initChart();
     } catch (error) {
       console.error("Error fetching stats:", error);
     }
   });
 
-  // Function to initialize the chart
   function initChart() {
     const ctx = document.getElementById("visitChart").getContext("2d");
 
     chart = new Chart(ctx, {
-      type: "bar", // You can change this to "pie" or "line" for different types of charts
+      type: "bar",
       data: {
-        labels: Object.keys(stats.pageVisits), // Page names
+        labels: Object.keys(stats.pageVisits),
         datasets: [
           {
-            label: "Page Visits",
-            data: Object.values(stats.pageVisits), // Visits count
+            label: "Obiski strani",
+            data: Object.values(stats.pageVisits),
             backgroundColor: "rgba(54, 162, 235, 0.2)",
             borderColor: "rgba(54, 162, 235, 1)",
             borderWidth: 1,
@@ -43,52 +38,67 @@
         scales: {
           y: {
             beginAtZero: true,
+            grid: {
+              color: "#e5e7eb",
+            },
+            ticks: {
+              color: "#4b5563",
+            },
+          },
+          x: {
+            grid: {
+              color: "#e5e7eb",
+            },
+            ticks: {
+              color: "#4b5563",
+            },
           },
         },
       },
     });
   }
 
-  // Function to update the chart with new stats
   function updateChart() {
-    // Update chart data
     chart.data.labels = Object.keys(stats.pageVisits);
     chart.data.datasets[0].data = Object.values(stats.pageVisits);
-
-    // Update the chart
     chart.update();
   }
+  
 </script>
 
 <style>
-  .stats {
-    margin-top: 20px;
-    padding: 10px;
-    border: 1px solid #ddd;
-    background: #f9f9f9;
-  }
-
   canvas {
     max-width: 100%;
     height: 400px;
   }
 </style>
 
-<h1>Visit Tracker</h1>
+<div class="min-h-screen bg-gray-50 py-10 px-4 sm:px-6 lg:px-8">
+  <div class="max-w-4xl mx-auto bg-white shadow-lg rounded-lg p-6">
+    <h1 class="text-3xl font-bold text-gray-900 text-center mb-8">Visit Tracker</h1>
 
-{#if stats}
-  <div class="stats">
-    <h2>Statistics</h2>
-    <p>Total Visits: {stats.totalVisits}</p>
-    <ul>
-      {#each Object.entries(stats.pageVisits) as [page, count]}
-        <li>{page}: {count} visits</li>
-      {/each}
-    </ul>
+    {#if stats}
+      <div>
+        <div class="bg-blue-100 text-blue-800 p-4 rounded-md mb-6">
+          <h2 class="text-2xl font-semibold">Statistics</h2>
+          <p class="text-lg mt-2">Total Visits: <span class="font-bold">{stats.totalVisits}</span></p>
+        </div>
 
-    <!-- Display the chart -->
-    <canvas id="visitChart"></canvas>
+        <ul class="divide-y divide-gray-200 mb-6">
+          {#each Object.entries(stats.pageVisits) as [page, count]}
+            <li class="flex justify-between items-center py-2">
+              <span class="text-gray-700 font-medium">{page}</span>
+              <span class="text-gray-900 font-bold">{count} visits</span>
+            </li>
+          {/each}
+        </ul>
+
+        <div class="relative">
+          <canvas id="visitChart"></canvas>
+        </div>
+      </div>
+    {:else}
+      <p class="text-center text-gray-600">Loading stats...</p>
+    {/if}
   </div>
-{:else}
-  <p>Loading stats...</p>
-{/if}
+</div>

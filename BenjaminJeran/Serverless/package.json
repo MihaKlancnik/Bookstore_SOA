@@ -1,0 +1,17 @@
+{
+    "name": "my-vercel-project",
+    "version": "1.0.0",
+    "description": "Serverless functions for book views tracking",
+    "main": "index.js",
+    "dependencies": {
+      "@vercel/kv": "^1.0.0", 
+      "express": "^4.17.1"       
+    },
+    "devDependencies": {},
+    "scripts": {
+      "start": "vercel dev"
+    },
+    "engines": {
+      "node": "16.x"
+    }
+  }

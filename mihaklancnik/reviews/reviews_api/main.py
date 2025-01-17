@@ -90,23 +90,21 @@ async def read_root(current_user: str = Depends(get_current_user)):
     """
     return {"message": "Welcome to REVIEWS!"}
 
-@app.get("/reviews/{review_id}", tags=["Reviews"])
-async def get_review(review_id: str, current_user: str = Depends(get_current_user)):
+@app.get("/reviews", tags=["Reviews"])
+async def get_reviews(current_user: str = Depends(get_current_user)):
     """
-    Get a review by its ID.
+    Get all reviews.
     """
     try:
-        review = await clan.find_one({"_id": ObjectId(review_id)})
-        if review is None:
-            raise HTTPException(status_code=404, detail="Review not found")
-
-        if review["user_id"] != current_user:
-            raise HTTPException(status_code=403, detail="You are not authorized to access this review")
-
-        review_dict = {**review}
-        review_dict["id"] = str(review_dict["_id"])
-        del review_dict["_id"]
-        return review_dict
+        reviews_cursor = clan.find()  # Fetches all reviews
+        reviews = await reviews_cursor.to_list(None)  # Converts cursor to list
+        reviews_list = []
+        for review in reviews:
+            review_dict = {**review}
+            review_dict["id"] = str(review_dict["_id"])  # Format MongoDB ObjectId
+            del review_dict["_id"]
+            reviews_list.append(review_dict)
+        return reviews_list
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 

@@ -150,7 +150,7 @@ async def get_orders_by_quantity(min_quantity: int, _: bool = Depends(verify_tok
 
 @app.post("/orders-update", response_model=Order, status_code=status.HTTP_201_CREATED,
           summary="Create a new order and update inventory", tags=["Orders"])
-async def create_order_with_inventory(order: Order, _: bool = Depends(verify_token)):
+async def create_order_with_inventory(order: Order, credentials: HTTPAuthorizationCredentials = Depends(security)):
     """
     Create a new order in the system and update inventory.
     """
@@ -162,8 +162,13 @@ async def create_order_with_inventory(order: Order, _: bool = Depends(verify_tok
     inventory_get_url = f"http://localhost:4002/api/inventory/{inventory_book_id}"
     inventory_decrement_url = f"http://localhost:4002/api/inventory/{inventory_book_id}/decrement"
 
+    token = credentials.credentials  # Extract the JWT from the Authorization header
+
+    headers = {"Authorization": f"Bearer {token}"}
+
     async with httpx.AsyncClient() as client:
-        inventory_response = await client.get(inventory_get_url)
+        # Include the JWT in the headers of the outgoing request
+        inventory_response = await client.get(inventory_get_url, headers=headers)
 
         if inventory_response.status_code == 404:
             raise HTTPException(status_code=404, detail="Book not found in inventory")
@@ -180,7 +185,7 @@ async def create_order_with_inventory(order: Order, _: bool = Depends(verify_tok
             raise HTTPException(status_code=400, detail="Not enough inventory available")
 
         decrement_payload = {"decrementAmount": order.quantity}
-        decrement_response = await client.put(inventory_decrement_url, json=decrement_payload)
+        decrement_response = await client.put(inventory_decrement_url, json=decrement_payload, headers=headers)
 
         if decrement_response.status_code == 404:
             raise HTTPException(status_code=404, detail="Book not found in inventory")

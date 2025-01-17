@@ -27,11 +27,22 @@ exports.getInventoryById = async (req, res) => {
 
 exports.createInventoryItem = async (req, res) => {
     const { book_id, quantity } = req.body;
+    const token = req.headers['authorization']?.split(' ')[1];
+
+    if (!token) {
+        return res.status(403).json({ error: 'Authorization token is required for inventory request.' });
+    }
+
     if (!book_id || quantity === undefined) {
         return res.status(400).json({ error: 'Book ID and quantity are required' });
     }
+
     try {
-        const getbookResponse = await axios.get('http://localhost:3000/books/' + book_id);
+        const getbookResponse = await axios.get('http://localhost:3000/books/' + book_id, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
 
         if (getbookResponse.status !== 200) {
             return res.status(400).json({ error: 'Book not found' });

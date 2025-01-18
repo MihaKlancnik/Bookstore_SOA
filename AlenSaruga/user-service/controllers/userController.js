@@ -67,7 +67,7 @@ exports.getUserById = async (req, res) => {
     const token = req.headers['authorization']?.split(' ')[1];
 
     if (!token) {
-        return res.status(403).json({ error: 'Authorization token is required for inventory request.' });
+        return res.status(403).json({ error: 'Authorization token is required for user request.' });
     }
 
     userModel.getUserById(id, async (err, user) => {

@@ -13,6 +13,12 @@ app.use(cors());
 const PORT = 4001;
 
 const verifyJWT = (req, res, next) => {
+
+    const excludedRoutes = ['/api/users/login', '/api/users/register'];
+    if (excludedRoutes.includes(req.path)) {
+        return next();
+    }
+    
     const token = req.headers['authorization']?.split(' ')[1]; 
 
     if (!token) {

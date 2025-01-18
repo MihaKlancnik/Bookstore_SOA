@@ -1,7 +1,7 @@
 const express = require("express");
-const nodemailer = require("nodemailer");
+const notificationController = require("../controllers/notificationController");
 
 const router = express.Router();
 
 
-//router.get(/)
+router.get('/notifications', notificationController.getNotifications);

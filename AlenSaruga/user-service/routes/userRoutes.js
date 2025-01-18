@@ -119,7 +119,7 @@ router.get('/', userController.getAllUsers);
 
 /**
  * @swagger
- * /users/{id}:
+ * /{id}:
  *   get:
  *     summary: Get a user by ID
  *     parameters:
@@ -165,7 +165,7 @@ router.get('/:id', userController.getUserById);
 
 /**
  * @swagger
- * /users:
+ * /register:
  *   post:
  *     summary: Create a new user
  *     requestBody:
@@ -213,11 +213,11 @@ router.get('/:id', userController.getUserById);
  *       500:
  *         description: Internal server error
  */
-router.post('/', userController.createUser);
+router.post('/register', userController.createUser);
 
 /**
  * @swagger
- * /users/bulk:
+ * /bulk:
  *   post:
  *     summary: Create multiple users
  *     requestBody:

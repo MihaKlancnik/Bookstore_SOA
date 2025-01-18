@@ -4,7 +4,7 @@
    async function handleCreateAccount() {
      const { username, password } = createAccountState;
      try {
-       const res = await fetch('http://localhost:4001/api/users', {
+       const res = await fetch('http://localhost:4001/api/users/register', {
            method: 'POST',
            body: JSON.stringify({ name: createAccountState.username, email: createAccountState.email, password: createAccountState.password }),
            headers: { 'Content-Type': 'application/json' }

@@ -26,7 +26,7 @@ function addDummyData() {
         INSERT INTO inventory (book_id, quantity) VALUES
         (1, 10),
         (2, 5),
-        (3, 3),
+        (3, 5),
         (4, 7),
         (5, 2);
     `;

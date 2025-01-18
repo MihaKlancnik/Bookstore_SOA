@@ -65,7 +65,7 @@ exports.getAllUsers = (req, res) => {
 exports.getUserById = async (req, res) => {
     const { id } = req.params;
     const token = req.headers['authorization']?.split(' ')[1];
-
+    
     if (!token) {
         return res.status(403).json({ error: 'Authorization token is required for user request.' });
     }

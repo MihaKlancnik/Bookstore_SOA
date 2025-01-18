@@ -42,22 +42,6 @@ export async function load() {
             return { users };
         }
         
-        /* if (role === "user") {
-            let id = decodedPayload.sub;
-            console.log("Prijavlen z uporabniškim računom: " + id);
-            const response = await fetch(`http://localhost:4001/api/users/${id}`, { headers });
-
-            if (!response.ok) {
-                throw error(500, 'Failed to load user data');
-            }
-
-            const users = await response.json();
-            //console.log(users);
-
-            return { users };
-        } */
-
-        
         if (role === "user") {
           let userId = decodedPayload.sub;
           console.log("Prijavlen z uporabniškim računom: " + userId);
@@ -69,7 +53,9 @@ export async function load() {
               throw error(500, 'Failed to load user data');
           }
 
-          const user = await userResponse.json();
+          const users = await userResponse.json();
+          console.log("Tukaj je user");
+          console.log(users);
 
           // Fetching the orders for the user
           const ordersResponse = await fetch(`http://localhost:2001/orders/user/${userId}`, { headers });
@@ -80,10 +66,9 @@ export async function load() {
 
 
           const orders = await ordersResponse.json();
-          console.log(orders);
-          
-          // Return user data along with their orders
-          return { user, orders };
+          console.log(orders);  
+           
+          return { users, orders };
       }
         throw error(403, 'Forbidden');
     }

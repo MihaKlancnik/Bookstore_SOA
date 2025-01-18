@@ -7,6 +7,7 @@
     console.log(data.users);
 
     let users = $state(data.users)
+    let orders = $state(data.orders);
 
     let newUser = $state({
         name: '',
@@ -18,6 +19,8 @@
     let error = null;
 
     let jwtToken = localStorage.getItem('jwt_token');
+    console.log("Tukaj je token: ")
+    console.log(jwtToken);
    
     if (!jwtToken){
         goto('/');
@@ -131,7 +134,7 @@
             {/each}
         </div>
     {/if}
-
+    
     <h1 class="font-bold text-6xl">Vaš račun</h1>
     <div class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
         <h2 class="font-bold text-xl mb-2">{users.name}</h2>
@@ -144,21 +147,22 @@
     </div>
 
     {#if UserState.role !== "admin"}
-            <h1 class="font-bold text-6xl">Moje naročila</h1>
-            {#if orders.length > 0}
-                <div class="flex flex-col gap-4 mt-6">
-                    {#each orders as order}
-                        <div class="rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6">
-                            <h2 class="font-bold text-xl mb-2">Naročilo #{order.order_id}</h2>
-                            <p class="text-gray-700 text-sm">Knjiga: {order.book_id}</p>
-                            <p class="text-gray-700 text-sm">Količina: {order.quantity}</p>
-                            <p class="text-gray-700 text-sm">Cena: {order.price}€</p>
-                        </div>
-                    {/each}
+    <h1 class="font-bold text-6xl">Moje naročila</h1>
+    {#if orders.length > 0}
+        <div class="flex flex-col gap-4 mt-6">
+            {#each orders as order}
+                <div class="rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6">
+                    <h2 class="font-bold text-xl mb-2">Naročilo #{order.order_id}</h2>
+                    <p class="text-gray-700 text-sm">Knjiga: {order.book_id}</p>
+                    <p class="text-gray-700 text-sm">Količina: {order.quantity}</p>
+                    <p class="text-gray-700 text-sm">Cena: {order.price}€</p>
                 </div>
-            {:else}
-                <p class="text-gray-600">Nimate nobenih naročil.</p>
-            {/if}
+            {/each}
+        </div>
+    {:else}
+        <p class="text-gray-600">Nimate nobenih naročil.</p>
     {/if}
+{/if}
+    
 </div>   
 {/if}

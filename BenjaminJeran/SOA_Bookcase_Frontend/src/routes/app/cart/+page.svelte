@@ -1,1 +1,0 @@
-<h1 class="mt-10 text-4xl font-bold text-center">Naročila</h1>

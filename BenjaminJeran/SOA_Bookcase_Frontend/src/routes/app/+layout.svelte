@@ -18,9 +18,8 @@
 
     <div class="flex space-x-6">
         <a href="/app/books" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Knjige</a>
-        <a href="/app/cart" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Košarica</a>
         {#if UserState.role === 'admin'}
-            <a href="/app/user" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Uporabniki</a>
+            <a href="/app/user" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Admin konzola</a>
         {:else}
             <a href="/app/user" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Moj račun</a>
         {/if}

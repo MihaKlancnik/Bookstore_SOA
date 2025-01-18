@@ -62,39 +62,39 @@ exports.getAllUsers = (req, res) => {
     });
 };
 
-exports.getUserById = async (req, res) => {
-    const { id } = req.params;
-    const token = req.headers['authorization']?.split(' ')[1];
+// exports.getUserById = async (req, res) => {
+//     const { id } = req.params;
+//     const token = req.headers['authorization']?.split(' ')[1];
     
-    if (!token) {
-        return res.status(403).json({ error: 'Authorization token is required for user request.' });
-    }
+//     if (!token) {
+//         return res.status(403).json({ error: 'Authorization token is required for user request.' });
+//     }
 
-    userModel.getUserById(id, async (err, user) => {
-        if (err) {
-            res.status(500).json({ error: err.message });
-        } else if (!user) {
-            res.status(404).json({ error: 'User not found' });
-        } else {
+//     userModel.getUserById(id, async (err, user) => {
+//         if (err) {
+//             res.status(500).json({ error: err.message });
+//         } else if (!user) {
+//             res.status(404).json({ error: 'User not found' });
+//         } else {
 
-            try {
-                const getReviewsResponse = await axios.get('http://localhost:3000/reviews/user/' + user.id, {
-                    headers: {
-                        'Authorization': `Bearer ${token}`,
-                    },
-                });
+//             try {
+//                 const getReviewsResponse = await axios.get('http://localhost:3000/reviews/user/' + user.id, {
+//                     headers: {
+//                         'Authorization': `Bearer ${token}`,
+//                     },
+//                 });
 
-                user.reviews = (getReviewsResponse.status === 200 && Array.isArray(getReviewsResponse.data))
-                    ? getReviewsResponse.data
-                    : [];
-            } catch (err) {
-                console.error('Error fetching reviews:', err.message);
-                user.reviews = [];
-            }
-            res.json(user);
-        }
-    });
-};
+//                 user.reviews = (getReviewsResponse.status === 200 && Array.isArray(getReviewsResponse.data))
+//                     ? getReviewsResponse.data
+//                     : [];
+//             } catch (err) {
+//                 console.error('Error fetching reviews:', err.message);
+//                 user.reviews = [];
+//             }
+//             res.json(user);
+//         }
+//     });
+// };
 
 
 exports.createUser = (req, res) => {

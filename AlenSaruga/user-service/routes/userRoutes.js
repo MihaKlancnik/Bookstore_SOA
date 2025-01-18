@@ -161,7 +161,7 @@ router.get('/', userController.getAllUsers);
  *       500:
  *         description: Internal server error
  */
-router.get('/:id', userController.getUserById);
+//router.get('/:id', userController.getUserById);
 
 /**
  * @swagger

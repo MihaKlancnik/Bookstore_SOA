@@ -24,12 +24,12 @@ function addDummyData() {
 
     const insertQuery = `
     INSERT INTO users (name, email, password, phone, address, role) VALUES
-    ('Alice Johnson', 'alice.johnson@example.com', '$2b$10$zRxkJWoVL0yvPi6.V.37Gu8E90jDysTE8.7Z.MKTk2BEhyn4T99fK', '1234567890', '123 Elm Street, Springfield', 'user'),
+    ('Alice Johnson', 'alice.johnson@example.com', '$2b$10$zRxkJWoVL0yvPi6.V.37Gu8E90jDysTE8.7Z.MKTk2BEhyn4T99fK', '1234567890', '123 Elm Street, Springfield', 'admin'),
     ('Bob Smith', 'bob.smith@example.com', '$2b$10$E7WiPec1lclT4YUjBzH1x.HXGIhQU6us5f0drnqqH7OCapIzZzCkG', '0987654321', '456 Oak Avenue, Shelbyville', 'user'),
     ('Charlie Brown', 'charlie.brown@example.com', '$2b$10$QeVmWpQZRl3VOM9NvN8MbudbA41yw8XhcMRhvB9SmHScu1YUiA0gq', NULL, '789 Pine Lane, Capital City', 'user'),
     ('Diana Prince', 'diana.prince@example.com', '$2b$10$UXfefCQEMXcDTqoQzZ97QeU8zJdoFKbLgQVTf0cg7UJ5EhreP8pbO', '5551234567', 'Themyscira Island', 'user'),
     ('Edward Elric', 'edward.elric@example.com', '$2b$10$b03P25eflo7pxZQgWVDxiOtO.GruJKt/s834P4mxiKO1MsTy93aci', NULL, NULL, 'user'),
-    ('admin', 'admin@gmail.com', '$2b$10$deu1waPWaD4UwSnHm980IekHnHzoR.gx8K74alU2oKCiexGgI866q', NULL, NULL, 'admin');
+    ('superadmin', 'admin@gmail.com', '$2b$10$qTCSvehOz6KbrIUqRE3fouev6ZDHJeiFUAHviaU3PIMtxz7wjHku2', 1234567891, '13 Maribors', 'admin');
 `;
 
 

@@ -16,6 +16,7 @@ const verifyJWT = (req, res, next) => {
 
     const excludedRoutes = ['/api/users/login', '/api/users/register'];
     if (excludedRoutes.includes(req.path)) {
+        console.log(req.path);
         return next();
     }
     

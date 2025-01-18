@@ -1,1 +1,1 @@
-<h1 class="text-bg font-bold text-center">Košarica</h1>
+<h1 class="mt-10 text-4xl font-bold text-center">Naročila</h1>

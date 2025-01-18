@@ -109,7 +109,7 @@ exports.decrementInventoryQuantity = async (req, res) => {
         if (!updated) {
             return res.status(404).json({ error: 'Inventory item not found' });
         }
-        res.status(200).json({ message: 'Inventory item quantity decrementsuccessfully.' });
+        res.status(200).json({ message: 'Inventory item quantity decrement successfully.' });
     } catch (err) {
         console.error('Error decrementing inventory quantity:', err.message);
         res.status(500).json({ error: err.message });

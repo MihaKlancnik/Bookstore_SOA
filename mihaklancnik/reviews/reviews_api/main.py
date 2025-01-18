@@ -12,6 +12,7 @@ from bson.objectid import ObjectId
 import jwt
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from typing import Optional
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -31,6 +32,17 @@ MONGODB_URI = "mongodb+srv://moji_prijatelji:knjigarna@ptscluster.qfts7.mongodb.
 client = AsyncIOMotorClient(MONGODB_URI)
 db = client["SOA"]
 clan = db["reviews"]
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods
+    allow_headers=["*"],  # Allows all headers
+)
+
+
 
 class Review(BaseModel):
     book_id: int

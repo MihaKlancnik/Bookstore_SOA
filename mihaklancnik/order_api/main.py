@@ -7,6 +7,7 @@ import os
 from dotenv import load_dotenv
 import jwt
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.middleware.cors import CORSMiddleware
 
 load_dotenv()
 
@@ -23,6 +24,15 @@ app = FastAPI(
     title="Order Management API",
     description="API for managing orders",
     version="1.0.0",
+)
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allows all origins
+    allow_credentials=True,
+    allow_methods=["*"],  # Allows all HTTP methods
+    allow_headers=["*"],  # Allows all headers
 )
 
 class Order(BaseModel):

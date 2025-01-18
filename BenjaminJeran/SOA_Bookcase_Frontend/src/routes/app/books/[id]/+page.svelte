@@ -62,6 +62,37 @@
         }
     }
 
+
+    async function buyBook() {
+        const orderData = {
+            order_id: Date.now(), // Generate a unique order ID (useful for demo purposes)
+            book_id: book.id,
+            quantity: 1, // Hardcoded to 1 for now
+            price: book.price
+        };
+
+        try {
+            const response = await fetch("http://localhost:8000/orders-update", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("jwt_token")}`,
+                },
+                body: JSON.stringify(orderData),
+            });
+
+            if (response.ok) {
+                alert("Book successfully purchased!");
+                inventory -= 1; // Update local inventory
+            } else {
+                const error = await response.json();
+                alert(error.detail || "Failed to purchase the book");
+            }
+        } catch (error) {
+            alert("Error: " + error.message);
+        }
+    }
+
 </script>
 
 <div class="min-h-screen bg-gray-100 py-8">
@@ -78,8 +109,8 @@
         {#if inventory > 0}
             <div class="flex justify-between items-center mt-4">
                 <span class="text-gray-900 font-semibold text-lg">${book.price}</span>
-                <button class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
-                    Dodaj v košarico
+                <button class="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition"  onclick={buyBook}>
+                    Kupi
                 </button>
             </div>
         {:else}

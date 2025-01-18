@@ -24,6 +24,7 @@
         {:else}
             <a href="/app/user" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Moj račun</a>
         {/if}
+        <a href="/app/stats" class="text-white font-medium hover:text-indigo-200 transition-colors duration-300">Statistika</a>
     </div>
 
     <div class="flex items-center space-x-4">

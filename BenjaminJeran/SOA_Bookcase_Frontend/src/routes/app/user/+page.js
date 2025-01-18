@@ -4,6 +4,20 @@ const headers = {
     'Content-Type': 'application/json',
 };
 
+async function logVisit(page) {
+    try {
+      const response = await fetch("http://localhost:5000/log-visit", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ page }),
+      });
+      
+    } catch (error) {
+      console.error("Error logging visit:", error);
+    }
+  }
+
+
 export async function load() {
     let jwtToken = localStorage.getItem('jwt_token');
 
@@ -12,6 +26,8 @@ export async function load() {
         let role = decodedPayload.role;
 
         headers['authorization'] = `Bearer ${jwtToken}`;
+
+        logVisit('user');
 
         if (role === "admin") {
             const response = await fetch('http://localhost:4001/api/users', { headers });

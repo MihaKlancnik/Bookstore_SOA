@@ -65,13 +65,14 @@
     async function buyBook() {
         const orderData = {
             order_id: Date.now(), 
+            user_id: userID,
             book_id: book.id,
             quantity: 1, 
             price: book.price
         };
 
         try {
-            const response = await fetch("http://localhost:8000/orders", {
+            const response = await fetch("http://localhost:2001/orders", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

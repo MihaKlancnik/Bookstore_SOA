@@ -10,8 +10,8 @@ COPY . /app
 # Install any needed packages specified in requirements.txt
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Expose port 2000 for the application
-EXPOSE 2003
+
+EXPOSE 8080
 
 # Run the application with Uvicorn on port 2000
-CMD ["uvicorn", "reviews_api:app", "--host", "0.0.0.0", "--port", "2003", "--reload"]
+CMD ["uvicorn", "new_review:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]

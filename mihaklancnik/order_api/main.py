@@ -27,6 +27,7 @@ app = FastAPI(
 
 class Order(BaseModel):
     order_id: int
+    user_id: int  # New field for user ID
     book_id: str
     quantity: int 
     price: float 
@@ -35,6 +36,7 @@ class Order(BaseModel):
         schema_extra = {
             "example": {
                 "order_id": 1,
+                "user_id": 1, 
                 "book_id": "book3",
                 "quantity": 3,
                 "price": 15.99
@@ -86,7 +88,7 @@ async def read_order(order_id: int, _: bool = Depends(verify_token)):
           summary="Create a new order", tags=["Orders"])
 async def create_order(order: Order, _: bool = Depends(verify_token)):
     """
-    Create a new order in the system. 
+    Create a new order in the system, including user_id.
     """
     order_dict = order.dict()
     result = await order_collection.insert_one(order_dict)
@@ -197,3 +199,19 @@ async def create_order_with_inventory(order: Order, credentials: HTTPAuthorizati
     order_dict["_id"] = str(result.inserted_id)
 
     return order_dict
+
+@app.get("/orders/user/{user_id}", response_model=List[Order], status_code=status.HTTP_200_OK,
+         summary="Get all orders for a specific user", tags=["Orders"])
+async def get_orders_by_user(user_id: int, _: bool = Depends(verify_token)):
+    """
+    Get all orders made by a specific user, identified by `user_id`.
+    """
+    orders = await order_collection.find({"user_id": user_id}).to_list(100)
+    if not orders:
+        raise HTTPException(
+            status_code=404,
+            detail=f"No orders found for user_id = {user_id}"
+        )
+    for order in orders:
+        order["_id"] = str(order["_id"])  # Convert MongoDB ObjectId to string
+    return orders

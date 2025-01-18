@@ -3,10 +3,8 @@
     let { data } = $props();
 
     let book = data.props.book;
-    let reviews = [];
+    let reviews = data.props.reviews.reviews;;
     
-    //let reviews = data.props.book.reviews;
-
     let inventory = $state(data.props.inventory.inventory);
 
     const decodedPayload = JSON.parse(atob(localStorage.getItem('jwt_token').split('.')[1]));
@@ -66,14 +64,14 @@
 
     async function buyBook() {
         const orderData = {
-            order_id: Date.now(), // Generate a unique order ID (useful for demo purposes)
+            order_id: Date.now(), 
             book_id: book.id,
-            quantity: 1, // Hardcoded to 1 for now
+            quantity: 1, 
             price: book.price
         };
 
         try {
-            const response = await fetch("http://localhost:8000/orders-update", {
+            const response = await fetch("http://localhost:8000/orders", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

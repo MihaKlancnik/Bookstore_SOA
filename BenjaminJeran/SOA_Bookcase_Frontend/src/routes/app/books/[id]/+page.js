@@ -34,8 +34,7 @@ export async function load({ params }) {
             console.log(`Failed to fetch book with ID: ${id}`);
         }
 
-        const reviews = await response_reviews.json(); 
-
+        let reviews = await response_reviews.json(); 
         console.log(reviews)
 
 

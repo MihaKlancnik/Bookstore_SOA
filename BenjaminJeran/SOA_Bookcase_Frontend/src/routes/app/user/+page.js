@@ -42,7 +42,7 @@ export async function load() {
             return { users };
         }
         
-        if (role === "user") {
+        /* if (role === "user") {
             let id = decodedPayload.sub;
             console.log("Prijavlen z uporabniškim računom: " + id);
             const response = await fetch(`http://localhost:4001/api/users/${id}`, { headers });
@@ -55,8 +55,36 @@ export async function load() {
             //console.log(users);
 
             return { users };
-        }
+        } */
 
+        
+        if (role === "user") {
+          let userId = decodedPayload.sub;
+          console.log("Prijavlen z uporabniškim računom: " + userId);
+          
+          // Fetching the user information
+          const userResponse = await fetch(`http://localhost:4001/api/users/${userId}`, { headers });
+
+          if (!userResponse.ok) {
+              throw error(500, 'Failed to load user data');
+          }
+
+          const user = await userResponse.json();
+
+          // Fetching the orders for the user
+          const ordersResponse = await fetch(`http://localhost:2001/orders/user/${userId}`, { headers });
+
+          if (!ordersResponse.ok) {
+              throw error(500, 'Failed to load orders data');
+          }
+
+
+          const orders = await ordersResponse.json();
+          console.log(orders);
+          
+          // Return user data along with their orders
+          return { user, orders };
+      }
         throw error(403, 'Forbidden');
     }
     

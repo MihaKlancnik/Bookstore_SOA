@@ -131,6 +131,7 @@
             {/each}
         </div>
     {/if}
+
     <h1 class="font-bold text-6xl">Vaš račun</h1>
     <div class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
         <h2 class="font-bold text-xl mb-2">{users.name}</h2>
@@ -141,6 +142,23 @@
             <span class="text-gray-600 text-sm">Joined: {new Date(users.created_at).toLocaleDateString()}</span>
         </div>
     </div>
-    
+
+    {#if UserState.role !== "admin"}
+            <h1 class="font-bold text-6xl">Moje naročila</h1>
+            {#if orders.length > 0}
+                <div class="flex flex-col gap-4 mt-6">
+                    {#each orders as order}
+                        <div class="rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6">
+                            <h2 class="font-bold text-xl mb-2">Naročilo #{order.order_id}</h2>
+                            <p class="text-gray-700 text-sm">Knjiga: {order.book_id}</p>
+                            <p class="text-gray-700 text-sm">Količina: {order.quantity}</p>
+                            <p class="text-gray-700 text-sm">Cena: {order.price}€</p>
+                        </div>
+                    {/each}
+                </div>
+            {:else}
+                <p class="text-gray-600">Nimate nobenih naročil.</p>
+            {/if}
+    {/if}
 </div>   
 {/if}

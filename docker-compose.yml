@@ -39,7 +39,7 @@ services:
       context: ./AlenSaruga/notification-service
       dockerfile: Dockerfile
     ports:
-      - "4003:4003" 
+      - "4004:4004" 
     environment:
       - SECRET_KEY=${SECRET_KEY}
     networks:

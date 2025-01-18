@@ -4,7 +4,7 @@ const notificationRoutes = require("./routes/notificationRoutes");
 
 const app = express();
 app.use(cors());
-const PORT = 4003;
+const PORT = 4004;
 
 const verifyJWT = (req, res, next) => { 
     const token = req.headers['authorization']?.split(' ')[1]; 

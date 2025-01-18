@@ -131,7 +131,19 @@
 
 <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6 justify-items-center">
     {#each books as book}
-    <a href={`/app/books/${book.id}`} class="w-full max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col transition-all transform hover:scale-105 hover:shadow-2xl hover:border-indigo-500">
+    <a 
+        href={`/app/books/${book.id}`} 
+        onclick={() => {
+            fetch('https://soa-serverless.vercel.app/api/click.js', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ bookId: book.id }),
+            })
+        }}
+        class="w-full max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col transition-all transform hover:scale-105 hover:shadow-2xl hover:border-indigo-500"
+    >
         <h2 class="font-bold text-xl mb-2 flex-grow">{book.title}</h2>
         <p class="text-gray-700 text-sm flex-grow">Avtor: {book.author}</p>
         <p class="text-gray-700 text-base mt-2 flex-grow">{book.description}</p>
@@ -140,4 +152,4 @@
         </div>
     </a>
     {/each}
-</div>
+ </div>

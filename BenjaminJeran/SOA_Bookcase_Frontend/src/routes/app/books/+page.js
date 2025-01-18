@@ -1,7 +1,6 @@
 import { error } from '@sveltejs/kit';
 
 
-
 async function logVisit(page) {
     try {
       const response = await fetch("http://localhost:5000/log-visit", {
@@ -14,7 +13,6 @@ async function logVisit(page) {
       console.error("Error logging visit:", error);
     }
   }
-
 
   export async function load() {
       const headers = {

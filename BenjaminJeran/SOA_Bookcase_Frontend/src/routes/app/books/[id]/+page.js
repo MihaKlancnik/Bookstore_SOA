@@ -26,6 +26,8 @@ export async function load({ params }) {
             throw new error(`Failed to fetch book with ID: ${id}`);
         }
 
+
+
         book = await response_book.json(); 
         console.log(book)
 
@@ -45,6 +47,20 @@ export async function load({ params }) {
 
         const inventory = await response_inventory.json(); 
 
+
+       /*  const clickResponse = await fetch('https://soa-serverless.vercel.app/api/click.js', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ bookId: id }),
+        });
+
+        if (!clickResponse.ok) {
+            console.error('Failed to send click data');
+        } else {
+            console.log('Click data sent successfully');
+        } */
 
         return { props: { book, reviews, inventory} };
     } catch (err) {

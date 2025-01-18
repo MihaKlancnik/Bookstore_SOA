@@ -1,26 +1,42 @@
-const { kv } = require('@vercel/kv');
+const { MongoClient } = require('mongodb');
+const uri = process.env.MONGO_URI;
 
-module.exports = async (req, res) => {
-    if (req.method === 'GET') {
-        try {
-            // Pridobi vse ključe (ID-je knjig) in njihove vrednosti (ogledi)
-            const allBooks = await kv.keys();
-            const booksWithViews = await Promise.all(allBooks.map(async (bookId) => {
-                const views = await kv.get(bookId);
-                return { bookId, views };
-            }));
+if (!uri) {
+  throw new Error('MONGO_URI environment variable is not set');
+}
 
-            // Razvrsti knjige po številu ogledov (od največ do najmanj)
-            const sortedBooks = booksWithViews.sort((a, b) => b.views - a.views);
+const handler = async (req, res) => {
+  const client = new MongoClient(uri);
+  
+  try {
+    await client.connect();
+    const database = client.db();
+    const books = database.collection('books');
+    
+    const mostViewedBooks = await books
+      .find({})
+      .sort({ views: -1 })
+      .limit(10)
+      .toArray();
 
-            // Vrni seznam najbolj obiskanih knjig
-            return res.status(200).json({ most_viewed_books: sortedBooks });
-        } catch (error) {
-            console.error('Error fetching most viewed books:', error);
-            return res.status(500).json({ error: 'Error fetching most viewed books' });
-        }
+    if (mostViewedBooks.length === 0) {
+      return res.status(200).json({ 
+        message: "No books found",
+        books: []
+      });
     }
 
-    // Če zahteva ni GET, vrni napako
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return res.status(200).json({ 
+      message: "Successfully retrieved most viewed books",
+      books: mostViewedBooks
+    });
+
+  } catch (error) {
+    console.error('Error fetching most viewed books:', error);
+    return res.status(500).json({ message: "Internal Server Error" });
+  } finally {
+    await client.close();
+  }
 };
+
+export default handler;

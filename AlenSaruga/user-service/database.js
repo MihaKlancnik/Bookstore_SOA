@@ -23,13 +23,15 @@ function addDummyData() {
     console.log('Adding dummy data to the database...');
 
     const insertQuery = `
-        INSERT INTO users (name, email, password, phone, address) VALUES
-        ('Alice Johnson', 'alice.johnson@example.com', 'password123', '1234567890', '123 Elm Street, Springfield'),
-        ('Bob Smith', 'bob.smith@example.com', 'securepass456', '0987654321', '456 Oak Avenue, Shelbyville'),
-        ('Charlie Brown', 'charlie.brown@example.com', 'pass789secure', NULL, '789 Pine Lane, Capital City'),
-        ('Diana Prince', 'diana.prince@example.com', 'wonderwoman321', '5551234567', 'Themyscira Island'),
-        ('Edward Elric', 'edward.elric@example.com', 'alchemy987', NULL, NULL);
-    `;
+    INSERT INTO users (name, email, password, phone, address, role) VALUES
+    ('Alice Johnson', 'alice.johnson@example.com', 'password123', '1234567890', '123 Elm Street, Springfield', 'user'),
+    ('Bob Smith', 'bob.smith@example.com', 'securepass456', '0987654321', '456 Oak Avenue, Shelbyville', 'user'),
+    ('Charlie Brown', 'charlie.brown@example.com', 'pass789secure', NULL, '789 Pine Lane, Capital City', 'user'),
+    ('Diana Prince', 'diana.prince@example.com', 'wonderwoman321', '5551234567', 'Themyscira Island', 'user'),
+    ('Edward Elric', 'edward.elric@example.com', 'alchemy987', NULL, NULL, 'user'),
+    ('admin', 'admin', 'admin', NULL, NULL, 'admin');
+`;
+
 
     db.run(insertQuery, (err) => {
         if (err) {
@@ -52,7 +54,8 @@ function initializeDatabase() {
     phone TEXT,                           
     address TEXT,
     reviews TEXT,
-    role TEXT DEFAULT 'user',                         
+    role TEXT DEFAULT 'user',
+    is_active BOOLEAN DEFAULT 1,                         
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP, 
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

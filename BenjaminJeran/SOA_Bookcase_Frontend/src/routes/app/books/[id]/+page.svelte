@@ -31,7 +31,8 @@
             book_id: book.id,
             user_id: userID,
             rating: rating,
-            comment: comment
+            comment: comment,
+            created_at: new Date().toISOString()
         };
 
         try {

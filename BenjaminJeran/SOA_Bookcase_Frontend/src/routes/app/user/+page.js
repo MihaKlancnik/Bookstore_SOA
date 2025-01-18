@@ -18,6 +18,25 @@ async function logVisit(page) {
   }
 
 
+  const fetchNotifications = async () => {
+    try {
+        const response = await fetch('https://notification-service-v1-0.onrender.com/api/notifications');
+
+        if (!response.ok) {
+            throw new Error('Failed to fetch notifications.');
+        }
+
+        const data = await response.json();
+        notifications = data.notifications;
+    } catch (err) {
+        error = err.message;
+    } finally {
+        loading = false;
+    }
+};
+
+
+
 export async function load() {
     let jwtToken = localStorage.getItem('jwt_token');
 
@@ -39,7 +58,17 @@ export async function load() {
             const users = await response.json();
             console.log(users);
 
-            return { users };
+
+            const notificationsResponse = await fetch('https://notification-service-v1-0.onrender.com/api/notifications');
+            console.log("notificationsResponse", notificationsResponse);
+  
+            if (!notificationsResponse.ok) {
+                throw new Error('Failed to fetch notifications.');
+            }
+  
+            const notifications = await notificationsResponse.text();
+
+            return { users, notifications };
         }
         
         if (role === "user") {
@@ -64,9 +93,9 @@ export async function load() {
               throw error(500, 'Failed to load orders data');
           }
 
-
           const orders = await ordersResponse.json();
-          console.log(orders);  
+          console.log(orders)
+  
            
           return { users, orders };
       }

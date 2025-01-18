@@ -129,15 +129,15 @@
     </form>
 {/if}
 
-<div class="mt-10 flex flex-row flex-wrap justify-center gap-8 px-4 mb-6">
+<div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5 mb-6 justify-items-center">
     {#each books as book}
-        <a href={`/app/books/${book.id}`} class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
-            <h2 class="font-bold text-xl mb-2">{book.title}</h2>
-            <p class="text-gray-700 text-sm">Avtor: {book.author}</p>
-            <p class="text-gray-700 text-base mt-2">{book.description}</p>
-            <div class="flex justify-between items-center mt-4">
-                <p class="text-gray-900 font-semibold text-lg">{book.price}€</p>
-            </div>
-        </a>
+    <a href={`/app/books/${book.id}`} class="w-full max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col transition-all transform hover:scale-105 hover:shadow-2xl hover:border-indigo-500">
+        <h2 class="font-bold text-xl mb-2 flex-grow">{book.title}</h2>
+        <p class="text-gray-700 text-sm flex-grow">Avtor: {book.author}</p>
+        <p class="text-gray-700 text-base mt-2 flex-grow">{book.description}</p>
+        <div class="flex justify-between items-center mt-4">
+            <p class="text-gray-900 font-semibold text-lg">{book.price}€</p>
+        </div>
+    </a>
     {/each}
 </div>

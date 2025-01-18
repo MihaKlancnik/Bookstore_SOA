@@ -135,7 +135,7 @@
         </div>
     {/if}
     
-    <h1 class="font-bold text-6xl">Vaš račun</h1>
+    <h1 class="font-bold text-4xl">Vaš račun</h1>
     <div class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
         <h2 class="font-bold text-xl mb-2">{users.name}</h2>
         <p class="text-gray-700 text-sm">Email: {users.email ? users.email : 'Neznano'}</p>
@@ -146,22 +146,26 @@
         </div>
     </div>
 
-    {#if UserState.role !== "admin"}
-    <h1 class="font-bold text-6xl">Moje naročila</h1>
+{#if UserState.role !== "admin"}
+    <h1 class="font-bold text-4xl text-center text-indigo-600">Moje naročila</h1>
+
     {#if orders.length > 0}
-        <div class="flex flex-col gap-4 mt-6">
+        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {#each orders as order}
-                <div class="rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6">
-                    <h2 class="font-bold text-xl mb-2">Naročilo #{order.order_id}</h2>
-                    <p class="text-gray-700 text-sm">Knjiga: {order.book_id}</p>
-                    <p class="text-gray-700 text-sm">Količina: {order.quantity}</p>
-                    <p class="text-gray-700 text-sm">Cena: {order.price}€</p>
+            <div class="rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 transition-all transform hover:scale-105 hover:shadow-2xl hover:border-indigo-500">
+                <h2 class="font-bold text-xl text-gray-900 mb-4">Naročilo #{order.order_id}</h2>
+                <div class="space-y-3">
+                    <p class="text-gray-700 text-sm"><span class="font-semibold text-indigo-600">Knjiga:</span> <span class="text-gray-800">{order.book_id}</span></p>
+                    <p class="text-gray-700 text-sm"><span class="font-semibold text-indigo-600">Količina:</span> <span class="text-gray-800">{order.quantity}</span></p>
+                    <p class="text-gray-700 text-sm"><span class="font-semibold text-indigo-600">Cena:</span> <span class="text-gray-800">{order.price}€</span></p>
                 </div>
+            </div>
             {/each}
         </div>
     {:else}
-        <p class="text-gray-600">Nimate nobenih naročil.</p>
+        <p class="text-gray-600 text-center text-lg mt-6">Nimate nobenih naročil.</p>
     {/if}
+
 {/if}
     
 </div>   

@@ -34,17 +34,6 @@ services:
     networks:
       - app-network
 
-  notificationservice:
-    build:
-      context: ./AlenSaruga/notification-service
-      dockerfile: Dockerfile
-    ports:
-      - "4004:4004" 
-    environment:
-      - SECRET_KEY=${SECRET_KEY}
-    networks:
-      - app-network
-
   frontendservice: 
     build:
       context: ./BenjaminJeran/SOA_Bookcase_Frontend

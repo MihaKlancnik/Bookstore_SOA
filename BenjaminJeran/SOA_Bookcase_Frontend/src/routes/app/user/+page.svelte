@@ -2,171 +2,201 @@
 	import { goto } from '$app/navigation';
 	import { UserState } from '$lib/state.svelte.js';
 
-    let { data } = $props();
+	let { data } = $props();
 
-    console.log(data.users);
+	console.log(data.users);
+	console.log('notifications', data.notifications);
 
-    let users = $state(data.users)
-    let orders = $state(data.orders);
+	let users = $state(data.users);
+	let orders = $state(data.orders);
+	let notifications = $state(data.notifications);
 
-    let newUser = $state({
-        name: '',
-        email: '',
-        password: ''
-    });
+	let newUser = $state({
+		name: '',
+		email: '',
+		password: ''
+	});
 
-    let loading = true;
-    let error = null;
+	let loading = true;
+	let error = null;
 
-    let jwtToken = localStorage.getItem('jwt_token');
-    console.log("Tukaj je token: ")
-    console.log(jwtToken);
-   
-    if (!jwtToken){
-        goto('/');
-    }
+	let jwtToken = localStorage.getItem('jwt_token');
+	console.log('Tukaj je token: ');
+	console.log(jwtToken);
 
-    const deleteUser = async (userId) => {
-        try {
-            const response = await fetch(`http://localhost:4001/api/users/${userId}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${jwtToken}`,
-                    'Content-Type': 'application/json',
-                },
-            });
+	if (!jwtToken) {
+		goto('/');
+	}
 
-            if (!response.ok) {
-                throw new Error('Failed to delete user.');
-            }
+	const deleteUser = async (userId) => {
+		try {
+			const response = await fetch(`http://localhost:4001/api/users/${userId}`, {
+				method: 'DELETE',
+				headers: {
+					Authorization: `Bearer ${jwtToken}`,
+					'Content-Type': 'application/json'
+				}
+			});
 
-            users = users.filter((user) => user.id !== userId);
-        } catch (err) {
-            alert(`Error deleting user: ${err.message}`);
-        }
-    };
+			if (!response.ok) {
+				throw new Error('Failed to delete user.');
+			}
 
-    const addUser = async () => {
-        try {
-            const response = await fetch('http://localhost:4001/api/users', {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${jwtToken}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(newUser),
-            });
+			users = users.filter((user) => user.id !== userId);
+		} catch (err) {
+			alert(`Error deleting user: ${err.message}`);
+		}
+	};
 
-            if (!response.ok) {
-                throw new Error('Failed to add user.');
-            }
+	const addUser = async () => {
+		try {
+			const response = await fetch('http://localhost:4001/api/users', {
+				method: 'POST',
+				headers: {
+					Authorization: `Bearer ${jwtToken}`,
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify(newUser)
+			});
 
-            const createdUser = await response.json();
-          
-            users = [...data.users, createdUser];
+			if (!response.ok) {
+				throw new Error('Failed to add user.');
+			}
 
-            newUser = {
-                name: '',
-                email: '',
-                password: ''
-            };
+			const createdUser = await response.json();
 
-        } catch (err) {
-            alert(`Error adding user: ${err.message}`);
-        }
-    };
+			users = [...data.users, createdUser];
 
-    
+			newUser = {
+				name: '',
+				email: '',
+				password: ''
+			};
+		} catch (err) {
+			alert(`Error adding user: ${err.message}`);
+		}
+	};
 </script>
 
 {#if jwtToken}
- <div class="flex flex-col gap-4 items-center p-6">
-    {#if UserState.role === "admin"}
-        <form 
-            onsubmit={addUser} 
-            class="flex flex-col gap-4 max-w-xl rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 "
-        >
-            <h2 class="text-lg font-semibold">Dodaj novega uporabnika</h2>
-            <input 
-                type="text" 
-                placeholder="Ime" 
-                bind:value={newUser.name} 
-                class="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-                required 
-            />
-            <input 
-                type="email" 
-                placeholder="E-pošta" 
-                bind:value={newUser.email} 
-                class="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-            />
-            <input 
-                type="text" 
-                placeholder="Geslo" 
-                bind:value={newUser.password} 
-                class="w-full px-4 py-2 mt-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
-            />
-            <button 
-                type="submit" 
-                class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-300"
-            >
-                Dodaj uporabnika
-            </button>
-        </form>
-        <div class="flex flex-row gap-6 justify-center flex-wrap">
-            {#each users as user}
-                <div class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
-                    <h2 class="font-bold text-xl mb-2">{user.name}</h2>
-                    <p class="text-gray-700 text-sm">Email: {user.email ? user.email : 'Neznano'}</p>
-                    <p class="text-gray-700 text-sm mt-2">Phone: {user.phone ? user.phone : 'Neznano'}</p>
-                    <p class="text-gray-700 text-sm mt-2">Address: {user.address ? user.address : 'Neznano'}</p>
-                    <div class="mt-4">
-                        <span class="text-gray-600 text-sm">Joined: {new Date(user.created_at).toLocaleDateString()}</span>
-                    </div>
-    
-                    <button 
-                        onclick={() => deleteUser(user.id)} 
-                        class="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition duration-300"
-                    >
-                        Izbriši
-                    </button>
-                </div>
-            {/each}
-        </div>
-    {/if}
-    
-    <h1 class="font-bold text-4xl">Vaš račun</h1>
-    <div class="max-w-sm rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 flex flex-col">
-        <h2 class="font-bold text-xl mb-2">{users.name}</h2>
-        <p class="text-gray-700 text-sm">Email: {users.email ? users.email : 'Neznano'}</p>
-        <p class="text-gray-700 text-sm mt-2">Phone: {users.phone ? users.phone : 'Neznano'}</p>
-        <p class="text-gray-700 text-sm mt-2">Address: {users.address ? users.address : 'Neznano'}</p>
-        <div class="mt-4">
-            <span class="text-gray-600 text-sm">Joined: {new Date(users.created_at).toLocaleDateString()}</span>
-        </div>
-    </div>
+	<div class="flex flex-col items-center gap-4 p-6">
+		{#if UserState.role === 'admin'}
+			<form
+				onsubmit={addUser}
+				class="flex max-w-xl flex-col gap-4 overflow-hidden rounded-lg border-2 border-gray-300 bg-white p-6 shadow-lg"
+			>
+				<h2 class="text-lg font-semibold">Dodaj novega uporabnika</h2>
+				<input
+					type="text"
+					placeholder="Ime"
+					bind:value={newUser.name}
+					class="mt-2 w-full rounded-lg border px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+					required
+				/>
+				<input
+					type="email"
+					placeholder="E-pošta"
+					bind:value={newUser.email}
+					class="mt-2 w-full rounded-lg border px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+				/>
+				<input
+					type="text"
+					placeholder="Geslo"
+					bind:value={newUser.password}
+					class="mt-2 w-full rounded-lg border px-4 py-2 focus:border-transparent focus:outline-none focus:ring-2 focus:ring-blue-400"
+				/>
+				<button
+					type="submit"
+					class="rounded-lg bg-blue-500 px-4 py-2 text-white transition duration-300 hover:bg-blue-600"
+				>
+					Dodaj uporabnika
+				</button>
+			</form>
+			<div class="p-4">
+				{#if notifications.length > 0}
+					<h2 class="mb-4 text-xl text-center font-semibold">Obvestilo!</h2>
+					<div>
+						<div class="mb-4 rounded-lg bg-white p-4 shadow-md">
+							<p class="text-gray-800">{@html notifications}</p>
+						</div>
+					</div>
+				{:else}
+					<p class="text-gray-500">Ni obvestil na voljo.</p>
+				{/if}
+			</div>
+			<div class="flex flex-row flex-wrap justify-center gap-6">
+				{#each users as user}
+					<div
+						class="flex max-w-sm flex-col overflow-hidden rounded-lg border-2 border-gray-300 bg-white p-6 shadow-lg"
+					>
+						<h2 class="mb-2 text-xl font-bold">{user.name}</h2>
+						<p class="text-sm text-gray-700">Email: {user.email ? user.email : 'Neznano'}</p>
+						<p class="mt-2 text-sm text-gray-700">Phone: {user.phone ? user.phone : 'Neznano'}</p>
+						<p class="mt-2 text-sm text-gray-700">
+							Address: {user.address ? user.address : 'Neznano'}
+						</p>
+						<div class="mt-4">
+							<span class="text-sm text-gray-600"
+								>Joined: {new Date(user.created_at).toLocaleDateString()}</span
+							>
+						</div>
 
-{#if UserState.role !== "admin"}
-    <h1 class="font-bold text-4xl text-center text-indigo-600">Moje naročila</h1>
+						<button
+							onclick={() => deleteUser(user.id)}
+							class="mt-4 rounded-lg bg-red-500 px-4 py-2 text-white transition duration-300 hover:bg-red-600"
+						>
+							Izbriši
+						</button>
+					</div>
+				{/each}
+			</div>
+		{/if}
 
-    {#if orders.length > 0}
-        <div class="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {#each orders as order}
-            <div class="rounded-lg border-2 border-gray-300 overflow-hidden shadow-lg bg-white p-6 transition-all transform hover:scale-105 hover:shadow-2xl hover:border-indigo-500">
-                <h2 class="font-bold text-xl text-gray-900 mb-4">Naročilo #{order.order_id}</h2>
-                <div class="space-y-3">
-                    <p class="text-gray-700 text-sm"><span class="font-semibold text-indigo-600">Knjiga:</span> <span class="text-gray-800">{order.book_id}</span></p>
-                    <p class="text-gray-700 text-sm"><span class="font-semibold text-indigo-600">Količina:</span> <span class="text-gray-800">{order.quantity}</span></p>
-                    <p class="text-gray-700 text-sm"><span class="font-semibold text-indigo-600">Cena:</span> <span class="text-gray-800">{order.price}€</span></p>
-                </div>
-            </div>
-            {/each}
-        </div>
-    {:else}
-        <p class="text-gray-600 text-center text-lg mt-6">Nimate nobenih naročil.</p>
-    {/if}
+		<h1 class="text-4xl font-bold">Vaš račun</h1>
+		<div
+			class="flex max-w-sm flex-col overflow-hidden rounded-lg border-2 border-gray-300 bg-white p-6 shadow-lg"
+		>
+			<h2 class="mb-2 text-xl font-bold">{users.name}</h2>
+			<p class="text-sm text-gray-700">Email: {users.email ? users.email : 'Neznano'}</p>
+			<p class="mt-2 text-sm text-gray-700">Phone: {users.phone ? users.phone : 'Neznano'}</p>
+			<p class="mt-2 text-sm text-gray-700">Address: {users.address ? users.address : 'Neznano'}</p>
+			<div class="mt-4">
+				<span class="text-sm text-gray-600"
+					>Joined: {new Date(users.created_at).toLocaleDateString()}</span
+				>
+			</div>
+		</div>
 
-{/if}
-    
-</div>   
+		{#if UserState.role !== 'admin'}
+			<h1 class="text-center text-4xl font-bold text-indigo-600">Moje naročila</h1>
+
+			{#if orders.length > 0}
+				<div class="mt-8 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+					{#each orders as order}
+						<div
+							class="transform overflow-hidden rounded-lg border-2 border-gray-300 bg-white p-6 shadow-lg transition-all hover:scale-105 hover:border-indigo-500 hover:shadow-2xl"
+						>
+							<h2 class="mb-4 text-xl font-bold text-gray-900">Naročilo #{order.order_id}</h2>
+							<div class="space-y-3">
+								<p class="text-sm text-gray-700">
+									<span class="font-semibold text-indigo-600">Knjiga:</span>
+									<span class="text-gray-800">{order.book_id}</span>
+								</p>
+								<p class="text-sm text-gray-700">
+									<span class="font-semibold text-indigo-600">Količina:</span>
+									<span class="text-gray-800">{order.quantity}</span>
+								</p>
+								<p class="text-sm text-gray-700">
+									<span class="font-semibold text-indigo-600">Cena:</span>
+									<span class="text-gray-800">{order.price}€</span>
+								</p>
+							</div>
+						</div>
+					{/each}
+				</div>
+			{:else}
+				<p class="mt-6 text-center text-lg text-gray-600">Nimate nobenih naročil.</p>
+			{/if}
+		{/if}
+	</div>
 {/if}

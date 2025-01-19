@@ -70,8 +70,42 @@ export async function load() {
                 notifications = await notificationsResponse.text();
             }
 
+            const query = `
+                query {
+                getInventory {
+                    id
+                    items {
+                    id
+                    quantity
+                    lastUpdated
+                    }
+                }
+                }
+            `;
 
-            return { users, notifications };
+            let inventory;
+
+            try {
+                const graphqlResponse = await fetch('http://localhost:4004/graphql', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query }),
+                });
+
+                if (!graphqlResponse.ok) {
+                    inventory = [];
+                }
+                else {
+                    const result = await graphqlResponse.json();
+                    inventory = result.data.getInventory.items;
+                }
+            }
+            catch (error) {
+                console.error('Failed to fetch inventory data:', error);
+                inventory = [];
+            }
+
+            return { users, notifications, inventory };
         }
 
         if (role === "user") {

@@ -6,10 +6,12 @@
 
 	console.log(data.users);
 	console.log('notifications', data.notifications);
+	console.log('inventory', data.inventory);
 
 	let users = $state(data.users);
 	let orders = $state(data.orders);
 	let notifications = $state(data.notifications);
+	let inventory = $state(data.inventory);
 
 	let newUser = $state({
 		name: '',
@@ -124,6 +126,33 @@
 					<p class="text-gray-500">Ni obvestil na voljo.</p>
 				{/if}
 			</div>
+
+			<div class="overflow-x-auto">
+				{#if inventory.length > 0}
+					<table class="min-w-full border-collapse border border-gray-300 bg-white shadow-lg">
+						<thead class="bg-gray-200">
+							<tr>
+								<th class="px-4 py-2 text-left text-gray-700 font-semibold border-b border-gray-300">ID</th>
+								<th class="px-4 py-2 text-left text-gray-700 font-semibold border-b border-gray-300">Količina</th>
+								<th class="px-4 py-2 text-left text-gray-700 font-semibold border-b border-gray-300">Nazadnje posodobljeno</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each inventory as item}
+								<tr class="hover:bg-gray-100">
+									<td class="px-4 py-2 border-b border-gray-300">{item.id}</td>
+									<td class="px-4 py-2 border-b border-gray-300">{item.quantity}</td>
+									<td class="px-4 py-2 border-b border-gray-300">{new Date(item.lastUpdated).toLocaleString()}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				{:else}
+					<p class="text-gray-700">Ni podatkov o zalogi.</p> <!-- Display message when inventory is empty -->
+				{/if}
+			</div>
+			
+			
 			<div class="flex flex-row flex-wrap justify-center gap-6">
 				{#each users as user}
 					<div

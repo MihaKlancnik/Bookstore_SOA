@@ -13,27 +13,11 @@ const app = express();
 app.use(cors());
 const PORT = process.env.PORT || 3000;
 
-const verifyJWT = (req, res, next) => {
-  const token = req.headers['authorization']?.split(' ')[1]; 
-
-  if (!token) {
-      return res.status(403).json({ message: 'Token is required' }); 
-  }
-
-  jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => { 
-      if (err) {
-          return res.status(403).json({ message: 'Invalid or expired token' }); 
-      }
-      req.user = decoded; 
-      next(); 
-  });
-};
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-
-app.use('/api/books', verifyJWT, booksRouter);
+app.use('/api/books', booksRouter);
 
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 

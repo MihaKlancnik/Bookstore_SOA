@@ -1,81 +1,102 @@
 const { ApolloServer } = require('@apollo/server');
 const { startStandaloneServer } = require('@apollo/server/standalone');
-const { MongoClient } = require('mongodb');
-
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri);
+const fetch = require('node-fetch');
 
 const typeDefs = `
-  type Book {
+  type BookBasic {
+    id: Int!
+    author: String!
+    category: String!
+    description: String!
+    price: Float!
+    stock: Int!
+    title: String!
+  }
+
+  type BookViews {
     _id: String!
+    createdAt: String
+    views: Int!
+  }
+
+  type BookEnriched {
+    id: Int!
+    author: String!
+    category: String!
+    description: String!
+    price: Float!
+    stock: Int!
+    title: String!
     views: Int!
     createdAt: String
   }
 
-  type Query {
-    getMostViewedBooks: [Book!]!
-    getBook(id: String!): Book
+  type VisitStats {
+    totalVisits: Int!
+    pageVisits: [PageVisit!]!
   }
 
-  type Mutation {
-    incrementBookViews(id: String!): Book
+  type PageVisit {
+    page: String!
+    visits: Int!
+  }
+
+  type Query {
+    getMostViewedBooks: [BookViews!]!
+    getVisitStats: VisitStats!
+    getAllBooks: [BookBasic!]!
+    getAllBooksEnriched: [BookEnriched!]!
   }
 `;
 
 const resolvers = {
   Query: {
     getMostViewedBooks: async () => {
-      try {
-        await client.connect();
-        const database = client.db();
-        const books = database.collection('books');
-        
-        return await books
-          .find({})
-          .sort({ views: -1 })
-          .limit(10)
-          .toArray();
-      } finally {
-        await client.close();
-      }
+      const response = await fetch("https://soa-serverless.vercel.app/api/most-viewed.js", {
+        method: "GET",
+      });
+      const data = await response.json();
+      return data.books;
     },
-    getBook: async (_, { id }) => {
-      try {
-        await client.connect();
-        const database = client.db();
-        const books = database.collection('books');
-        
-        return await books.findOne({ _id: id });
-      } finally {
-        await client.close();
-      }
+    getVisitStats: async () => {
+      const response = await fetch("http://localhost:5000/stats", {
+        method: "GET",
+      });
+      const data = await response.json();
+      return {
+        totalVisits: data.totalVisits,
+        pageVisits: Object.entries(data.pageVisits).map(([page, visits]) => ({
+          page,
+          visits,
+        })),
+      };
+    },
+    getAllBooks: async () => {
+      const response = await fetch("http://localhost:3000/");
+      return response.json();
+    },
+    getAllBooksEnriched: async () => {
+      const [viewsResponse, booksResponse] = await Promise.all([
+        fetch("https://soa-serverless.vercel.app/api/most-viewed.js"),
+        fetch("http://localhost:3000/")
+      ]);
+
+      const viewsData = await viewsResponse.json();
+      const booksData = await booksResponse.json();
+
+      // Create a map of views data for easy lookup
+      const viewsMap = new Map(
+        viewsData.books.map(book => [book._id, book])
+      );
+
+      // Combine the data
+      return booksData.map(book => ({
+        ...book,
+        views: viewsMap.get(book.id.toString())?.views || 0,
+        createdAt: viewsMap.get(book.id.toString())?.createdAt || null
+      }));
     }
   },
-  Mutation: {
-    incrementBookViews: async (_, { id }) => {
-      try {
-        await client.connect();
-        const database = client.db();
-        const books = database.collection('books');
-        
-        const result = await books.findOneAndUpdate(
-          { _id: id },
-          { 
-            $inc: { views: 1 },
-            $setOnInsert: { createdAt: new Date().toISOString() }
-          },
-          { 
-            upsert: true,
-            returnDocument: 'after'
-          }
-        );
-        
-        return result;
-      } finally {
-        await client.close();
-      }
-    }
-  }
 };
 
 async function startServer() {
@@ -85,7 +106,7 @@ async function startServer() {
   });
 
   const { url } = await startStandaloneServer(server, {
-    listen: { port: 4000 }
+    listen: { port: 4000 },
   });
 
   console.log(`🚀 Server ready at ${url}`);

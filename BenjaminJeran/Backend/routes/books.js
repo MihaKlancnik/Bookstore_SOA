@@ -1,8 +1,33 @@
 const express = require('express');
 const db = require('../database'); 
 const axios = require('axios');
+const jwt = require('jsonwebtoken');
+
 
 const router = express.Router();
+
+const isAdmin = (req, res, next) => {
+    if (req.user?.role !== 'admin') {
+        return res.status(403).json({ error: 'Access denied. Admin role required.' });
+    }
+    next();
+};
+
+const verifyJWT = (req, res, next) => {
+    const token = req.headers['authorization']?.split(' ')[1]; 
+  
+    if (!token) {
+        return res.status(403).json({ message: 'Token is required' }); 
+    }
+  
+    jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => { 
+        if (err) {
+            return res.status(403).json({ message: 'Invalid or expired token' }); 
+        }
+        req.user = decoded; 
+        next(); 
+    });
+  };
 
 /**
  * @swagger
@@ -115,7 +140,7 @@ router.get('/:id', (req, res) => {
  *       500:
  *         description: Internal server error
  */
-router.post('/', (req, res) => {
+router.post('/', verifyJWT, isAdmin,  (req, res) => {
     const { title, author, category, price, stock, description } = req.body;
 
     if (!title || !author || stock === undefined) {
@@ -174,7 +199,7 @@ router.post('/', (req, res) => {
  *       500:
  *         description: Internal server error
  */
-router.put('/:id', (req, res) => {
+router.put('/:id', verifyJWT, isAdmin, (req, res) => {
     const { title, author, category, price, stock, description } = req.body;
     const bookId = req.params.id;
 
@@ -228,7 +253,7 @@ router.put('/:id', (req, res) => {
  *       500:
  *         description: Internal server error
  */
-router.delete('/:id', (req, res) => {
+router.delete('/:id', verifyJWT, isAdmin, (req, res) => {
     const bookId = req.params.id;
     const query = 'DELETE FROM books WHERE id = ?';
 

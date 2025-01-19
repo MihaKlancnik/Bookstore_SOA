@@ -181,22 +181,23 @@
 			</div>
 		{/if}
 
-		<h1 class="text-4xl font-bold">Vaš račun</h1>
-		<div
-			class="flex max-w-sm flex-col overflow-hidden rounded-lg border-2 border-gray-300 bg-white p-6 shadow-lg"
-		>
-			<h2 class="mb-2 text-xl font-bold">{users.name}</h2>
-			<p class="text-sm text-gray-700">Email: {users.email ? users.email : 'Neznano'}</p>
-			<p class="mt-2 text-sm text-gray-700">Phone: {users.phone ? users.phone : 'Neznano'}</p>
-			<p class="mt-2 text-sm text-gray-700">Address: {users.address ? users.address : 'Neznano'}</p>
-			<div class="mt-4">
-				<span class="text-sm text-gray-600"
-					>Joined: {new Date(users.created_at).toLocaleDateString()}</span
-				>
-			</div>
-		</div>
+		
 
 		{#if UserState.role !== 'admin'}
+			<h1 class="text-4xl font-bold">Vaš račun</h1>
+			<div
+				class="flex max-w-sm flex-col overflow-hidden rounded-lg border-2 border-gray-300 bg-white p-6 shadow-lg"
+			>
+				<h2 class="mb-2 text-xl font-bold">{users.name}</h2>
+				<p class="text-sm text-gray-700">Email: {users.email ? users.email : 'Neznano'}</p>
+				<p class="mt-2 text-sm text-gray-700">Phone: {users.phone ? users.phone : 'Neznano'}</p>
+				<p class="mt-2 text-sm text-gray-700">Address: {users.address ? users.address : 'Neznano'}</p>
+				<div class="mt-4">
+					<span class="text-sm text-gray-600"
+						>Joined: {new Date(users.created_at).toLocaleDateString()}</span
+					>
+				</div>
+			</div>
 			<h1 class="text-center text-4xl font-bold text-indigo-600">Moje naročila</h1>
 
 			{#if orders.length > 0}

@@ -20,6 +20,7 @@ async function startServer() {
   const PORT = 4004;
   app.listen(PORT, () => {
     console.log(`🚀 Server ready at http://localhost:${PORT}${server.graphqlPath}`);
+    //http://localhost:4004/graphql
   });
 }
 

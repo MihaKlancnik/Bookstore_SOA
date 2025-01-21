@@ -43,13 +43,13 @@ const bodyParser = require("body-parser");
 const cors = require("cors");
 const { MongoClient } = require("mongodb");
 
-console.log('Mongo URI:', process.env.MONGO_URI);
+console.log('Mongo URI:', process.env.MONGO_URL);
 
 const app = express();
 const PORT = 5000;
 
 // MongoDB Connection URL - nevem zaka ne dela prek env
-const mongoUrl = "mongodb+srv://soa:SOA_12345@mydatabase.h9zemph.mongodb.net/Projekt_SOA"
+const mongoUrl = MONGO_URL
 const dbName = "Projekt_SOA";
 const collectionName = "views";
 

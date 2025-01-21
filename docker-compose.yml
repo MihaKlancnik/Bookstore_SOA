@@ -9,6 +9,7 @@ services:
       - ./books.db:/usr/src/app/books.db
     environment:
       - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URL=${MONGO_URL}
     networks:
       - app-network
 
@@ -20,6 +21,7 @@ services:
       - "4001:4001" 
     environment:
       - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URL=${MONGO_URL}
     networks:
       - app-network
 
@@ -31,6 +33,7 @@ services:
       - "4002:4002" 
     environment:
       - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URL=${MONGO_URL}
     networks:
       - app-network
 
@@ -42,6 +45,7 @@ services:
       - "4004:4004" 
     environment:
       - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URL=${MONGO_URL}
     networks:
       - app-network
 
@@ -53,6 +57,7 @@ services:
       - "5173:5173"
     environment:
       - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URL=${MONGO_URL}
     networks:
       - app-network
 
@@ -75,6 +80,7 @@ services:
       - "2001:2001"
     environment:
       - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URL=${MONGO_URL}
     networks:
       - app-network
 
@@ -84,6 +90,9 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5000:5000" 
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URL=${MONGO_URL}
     networks:
       - app-network
 

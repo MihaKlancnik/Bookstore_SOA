@@ -13,6 +13,7 @@
   "dependencies": {
     "@apollo/server": "^4.11.3",
     "apollo-server": "^3.13.0",
+    "cors": "^2.8.5",
     "graphql": "^16.10.0",
     "mongodb": "^6.12.0"
   }

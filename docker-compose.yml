@@ -96,6 +96,18 @@ services:
     networks:
       - app-network
 
+  graphql-jeran:
+    build:
+      context: ./BenjaminJeran/GraphQL
+      dockerfile: Dockerfile
+    ports:
+      - "4000:4000" 
+    environment:
+      - SECRET_KEY=${SECRET_KEY}
+      - MONGO_URL=${MONGO_URL}
+    networks:
+      - app-network
+
 networks:
   app-network:
     driver: bridge

@@ -3,7 +3,7 @@ import { error } from '@sveltejs/kit';
 
 async function logVisit(page) {
     try {
-      const response = await fetch("http://localhost:5000/log-visit", {
+      const response = await fetch("https://visitors-latest.onrender.com/log-visit", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ page }),

@@ -5,21 +5,22 @@
   let stats = { totalVisits: 0, pageVisits: {} };
   let mostViewedBooks = [];
   let detailedBooks = [];
+  let allEnrichedBooks = [];
 
   let chart;
 
   onMount(async () => {
     try {
-      // Fetch stats
-      const statsResponse = await fetch("http://localhost:5000/stats");
+      // Obstoječi REST API klic za obisk stats
+      const statsResponse = await fetch("https://visitors-latest.onrender.com/stats");
       stats = await statsResponse.json();
 
-      // Fetch most viewed books
+      // Obstoječi REST API klic za najbolj ogledane knjige
       const mostViewedResponse = await fetch("https://soa-serverless.vercel.app/api/most-viewed.js");
       const mostViewedData = await mostViewedResponse.json();
-      mostViewedBooks = mostViewedData.books.slice(0, 3); // Get top three books
+      mostViewedBooks = mostViewedData.books.slice(0, 3); 
 
-      // Add JWT token for book details API
+      // JWT avtentifikacija
       const jwtToken = localStorage.getItem("jwt_token");
       const headers = jwtToken
         ? {
@@ -28,11 +29,51 @@
           }
         : { "Content-Type": "application/json" };
 
-      // Fetch detailed data for each of the top three books
+      // Poizvedba za pridobivanje podrobnosti knjig
       const bookDetailsPromises = mostViewedBooks.map(book => 
         fetch(`http://127.0.0.1:3000/api/books/${book._id}`, { headers }).then(res => res.json())
       );
       detailedBooks = await Promise.all(bookDetailsPromises);
+
+      // GraphQL query for enriched books data
+      const graphqlQuery = {
+        query: `
+          query {
+            getAllBooksEnriched {
+              id
+              title
+              author
+              category
+              description
+              price
+              stock
+              views
+              createdAt
+            }
+          }
+        `
+      };
+      
+      const graphqlResponse = await fetch("http://localhost:4000/", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(graphqlQuery),
+  credentials: 'include',
+  mode: 'cors'
+});
+
+      const graphqlData = await graphqlResponse.json();
+      
+      if (graphqlData.errors) {
+        console.error("GraphQL Errors:", graphqlData.errors);
+        throw new Error("GraphQL query failed");
+      }
+      
+      allEnrichedBooks = graphqlData.data.getAllBooksEnriched;
+      // Sort books by views in descending order
+      allEnrichedBooks.sort((a, b) => b.views - a.views);
 
       initChart();
     } catch (error) {
@@ -87,6 +128,12 @@
     chart.data.datasets[0].data = Object.values(stats.pageVisits);
     chart.update();
   }
+
+  // Format date function
+  function formatDate(dateString) {
+    if (!dateString) return 'N/A';
+    return new Date(dateString).toLocaleDateString();
+  }
 </script>
 
 <style>
@@ -135,6 +182,52 @@
               </li>
             {/each}
           </ul>
+        </div>
+
+        <div class="bg-yellow-100 text-yellow-800 p-4 rounded-md mt-8">
+          <h2 class="text-2xl font-semibold">All Books with View Counts</h2>
+          <div class="overflow-x-auto">
+            <table class="min-w-full mt-4 divide-y divide-gray-200">
+              <thead class="bg-yellow-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Views</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                {#each allEnrichedBooks as book}
+                  <tr class="hover:bg-gray-50">
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-medium text-gray-900">{book.title}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500">{book.author}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500">{book.category}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm font-bold text-gray-900">{book.views}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500">${book.price}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500">{book.stock}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-500">{formatDate(book.createdAt)}</div>
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     {:else}

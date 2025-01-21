@@ -1,7 +1,7 @@
 # Dockerfile
 FROM node:18-alpine
 
-# Nastavimo delovno okolje
+# Nastavimo okolje
 WORKDIR /usr/src/app
 
 # Kopiramo datoteke za aplikacijo

@@ -15,8 +15,22 @@ const swaggerOptions = {
                 description: 'Development server',
             },
         ],
+        security: [
+            {
+                BearerAuth: []
+            }
+        ],
+        components: {
+            securitySchemes: {
+                BearerAuth: {
+                    type: 'http',
+                    scheme: 'bearer',
+                    bearerFormat: 'JWT'
+                }
+            }
+        }
     },
-    apis: ['./routes/books.js'], 
+    apis: ['./routes/books.js'],
 };
 
 const swaggerDocs = swaggerJsDoc(swaggerOptions);

@@ -6,7 +6,7 @@ services:
     ports:
       - "3000:3000" 
     volumes:
-      - ./books.db:/usr/src/app/books.db
+      - ./BenjaminJeran/Backend/books.db:/app/books.db
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - MONGO_URL=${MONGO_URL}

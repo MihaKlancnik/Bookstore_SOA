@@ -19,6 +19,8 @@ services:
       dockerfile: Dockerfile
     ports:
       - "4001:4001" 
+    volumes: 
+      - ./users.db:/usr/src/app/users.db
     environment:
       - SECRET_KEY=${SECRET_KEY}
       - MONGO_URL=${MONGO_URL}

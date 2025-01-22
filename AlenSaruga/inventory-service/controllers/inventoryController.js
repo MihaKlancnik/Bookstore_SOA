@@ -38,7 +38,7 @@ exports.createInventoryItem = async (req, res) => {
     }
 
     try {
-        const getbookResponse = await axios.get('http://localhost:3000/books/' + book_id, {
+        const getbookResponse = await axios.get('http://booksservice:3000/api/books/' + book_id, {
             headers: {
                 Authorization: `Bearer ${token}`,
             },

@@ -74,14 +74,14 @@ const resolvers = {
       };
     },
     getAllBooks: async () => {
-      const response = await fetch("http://localhost:3000/api/books");  // Updated endpoint
+      const response = await fetch("http://booksservice:3000/api/books");  // Updated endpoint
       return response.json();
     },
     getAllBooksEnriched: async () => {
       try {
         const [viewsResponse, booksResponse] = await Promise.all([
           fetch("https://soa-serverless.vercel.app/api/most-viewed.js"),
-          fetch("http://localhost:3000/api/books")  // Updated endpoint
+          fetch("http://booksservice:3000/api/books")  // Updated endpoint
         ]);
 
         if (!viewsResponse.ok) {

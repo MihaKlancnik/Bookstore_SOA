@@ -47,10 +47,11 @@ exports.createInventoryItem = async (req, res) => {
         if (getbookResponse.status !== 200) {
             return res.status(400).json({ error: 'Book not found' });
         }
-        const book = getbookResponse.data;
-        if (book.quantity === undefined) {
-            return res.status(400).json({ error: 'Book quantity is required' });
-        }
+
+        //const book = getbookResponse.data;
+        //if (book.quantity === undefined) {
+        //    return res.status(400).json({ error: 'Book quantity is required' });
+        //}
     }
     catch (err) {
         console.error('Error fetching book:', err.message);

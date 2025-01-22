@@ -453,72 +453,6 @@ router.get('/:id/inventory', async (req, res) => {
     }
 });
 
-/**
- * @swagger
- * components:
- *   schemas:
- *     Book:
- *       type: object
- *       properties:
- *         id:
- *           type: integer
- *           description: Auto-generated ID of the book
- *         title:
- *           type: string
- *           description: Title of the book
- *         author:
- *           type: string
- *           description: Author of the book
- *         category:
- *           type: string
- *           description: Category of the book
- *         price:
- *           type: number
- *           format: float
- *           description: Price of the book
- *         stock:
- *           type: integer
- *           description: Stock count of the book
- *         description:
- *           type: string
- *           description: A brief description of the book
- *       example:
- *         id: 1
- *         title: "Sample Book"
- *         author: "John Doe"
- *         category: "Fiction"
- *         price: 15.99
- *         stock: 10
- *         description: "An amazing book."
- *     BookInput:
- *       type: object
- *       required:
- *         - title
- *         - author
- *         - stock
- *       properties:
- *         title:
- *           type: string
- *         author:
- *           type: string
- *         category:
- *           type: string
- *         price:
- *           type: number
- *           format: float
- *         stock:
- *           type: integer
- *         description:
- *           type: string
- *       example:
- *         title: "New Book"
- *         author: "Jane Doe"
- *         category: "Science"
- *         price: 20.00
- *         stock: 15
- *         description: "An insightful book."
- */
-
 
 
 /**
@@ -710,5 +644,80 @@ router.delete('/batch', verifyJWT, isAdmin, (req, res) => {
         res.status(200).json({ deleted: this.changes }); 
     });
 });
+
+
+/**
+ * @swagger
+ * components:
+ *   securitySchemes:
+ *     BearerAuth:
+ *       type: apiKey
+ *       in: header
+ *       name: Authorization
+ *       description: 'Enter JWT token as Bearer <your_token>'
+ *   schemas:
+ *     Book:
+ *       type: object
+ *       properties:
+ *         id:
+ *           type: integer
+ *           description: Auto-generated ID of the book
+ *         title:
+ *           type: string
+ *           description: Title of the book
+ *         author:
+ *           type: string
+ *           description: Author of the book
+ *         category:
+ *           type: string
+ *           description: Category of the book
+ *         price:
+ *           type: number
+ *           format: float
+ *           description: Price of the book
+ *         stock:
+ *           type: integer
+ *           description: Stock count of the book
+ *         description:
+ *           type: string
+ *           description: A brief description of the book
+ *       example:
+ *         id: 1
+ *         title: "Sample Book"
+ *         author: "John Doe"
+ *         category: "Fiction"
+ *         price: 15.99
+ *         stock: 10
+ *         description: "An amazing book."
+ *     BookInput:
+ *       type: object
+ *       required:
+ *         - title
+ *         - author
+ *         - stock
+ *       properties:
+ *         title:
+ *           type: string
+ *         author:
+ *           type: string
+ *         category:
+ *           type: string
+ *         price:
+ *           type: number
+ *           format: float
+ *         stock:
+ *           type: integer
+ *         description:
+ *           type: string
+ *       example:
+ *         title: "New Book"
+ *         author: "Jane Doe"
+ *         category: "Science"
+ *         price: 20.00
+ *         stock: 15
+ *         description: "An insightful book."
+ * security:
+ *   - BearerAuth: []   # This applies globally
+ */
 
 module.exports = router;

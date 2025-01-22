@@ -17,4 +17,4 @@ COPY . .
 EXPOSE 4000
 
 # Določimo ukaz za zagon aplikacije
-CMD ["node", "index.js"]
+CMD ["node", "server.js"]

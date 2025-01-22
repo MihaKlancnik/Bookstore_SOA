@@ -519,4 +519,196 @@ router.get('/:id/inventory', async (req, res) => {
  *         description: "An insightful book."
  */
 
+
+
+/**
+ * @swagger
+ * /books/batch:
+ *   post:
+ *     summary: Add multiple books
+ *     description: Creates multiple books in the database at once.
+ *     tags:
+ *       - Books
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: array
+ *             items:
+ *               $ref: '#/components/schemas/BookInput'
+ *     responses:
+ *       201:
+ *         description: Books successfully created
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 created:
+ *                   type: integer
+ *                   description: Number of books created
+ *       400:
+ *         description: Bad request, missing required fields
+ *       500:
+ *         description: Internal server error
+ */
+router.post('/batch', verifyJWT, isAdmin, (req, res) => {
+    const books = req.body;
+
+    if (!Array.isArray(books) || books.length === 0) {
+        return res.status(400).json({ error: 'Request body must be an array of books.' });
+    }
+
+    const query = `INSERT INTO books (title, author, category, price, stock, description) 
+                   VALUES (?, ?, ?, ?, ?, ?)`;
+
+    const statements = books.map(book => [
+        book.title, book.author, book.category, book.price, book.stock, book.description
+    ]);
+
+    const placeholders = statements.map(() => '(?, ?, ?, ?, ?, ?)').join(', ');
+    const flattenedValues = statements.flat();
+
+    db.run(`INSERT INTO books (title, author, category, price, stock, description) VALUES ${placeholders}`,
+        flattenedValues,
+        function (err) {
+            if (err) {
+                console.error('Error adding books in batch:', err.message);
+                return res.status(500).json({ error: err.message });
+            }
+            res.status(201).json({ created: this.changes }); // Respond with the number of created rows
+        }
+    );
+});
+
+/**
+ * @swagger
+ * /books/{id}/stock:
+ *   put:
+ *     summary: Update the stock of a book
+ *     description: Updates the stock count of a book by its ID.
+ *     tags:
+ *       - Books
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         description: The ID of the book to update
+ *         schema:
+ *           type: integer
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               stock:
+ *                 type: integer
+ *                 description: New stock count
+ *             example:
+ *               stock: 20
+ *     responses:
+ *       200:
+ *         description: Successfully updated the stock
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 updated:
+ *                   type: integer
+ *                   description: Number of updated rows
+ *       400:
+ *         description: Bad request, missing required fields or invalid data
+ *       404:
+ *         description: Book not found
+ *       500:
+ *         description: Internal server error
+ */
+router.put('/:id/stock', verifyJWT, isAdmin, (req, res) => {
+    const { stock } = req.body;
+    const bookId = req.params.id;
+
+    if (stock === undefined || typeof stock !== 'number') {
+        return res.status(400).json({ error: 'Stock is required and must be a number.' });
+    }
+
+    const query = `UPDATE books SET stock = ? WHERE id = ?`;
+
+    db.run(query, [stock, bookId], function (err) {
+        if (err) {
+            console.error('Error updating stock:', err.message);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        if (this.changes === 0) {
+            res.status(404).json({ error: 'Book not found' });
+            return;
+        }
+        res.status(200).json({ updated: this.changes }); 
+    });
+});
+
+/**
+ * @swagger
+ * /books/batch:
+ *   delete:
+ *     summary: Delete multiple books by IDs
+ *     description: Deletes multiple books from the database based on an array of IDs.
+ *     tags:
+ *       - Books
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ids:
+ *                 type: array
+ *                 items:
+ *                   type: integer
+ *                 description: Array of book IDs to delete
+ *             example:
+ *               ids: [1, 2, 3]
+ *     responses:
+ *       200:
+ *         description: Successfully deleted the books
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 deleted:
+ *                   type: integer
+ *                   description: Number of deleted rows
+ *       400:
+ *         description: Bad request, missing or invalid IDs
+ *       500:
+ *         description: Internal server error
+ */
+
+router.delete('/batch', verifyJWT, isAdmin, (req, res) => {
+    const { ids } = req.body;
+
+    if (!Array.isArray(ids) || ids.length === 0) {
+        return res.status(400).json({ error: 'Request body must contain an array of IDs.' });
+    }
+
+    const placeholders = ids.map(() => '?').join(', ');
+
+    const query = `DELETE FROM books WHERE id IN (${placeholders})`;
+
+    db.run(query, ids, function (err) {
+        if (err) {
+            console.error('Error deleting books in batch:', err.message);
+            res.status(500).json({ error: err.message });
+            return;
+        }
+        res.status(200).json({ deleted: this.changes }); 
+    });
+});
+
 module.exports = router;
